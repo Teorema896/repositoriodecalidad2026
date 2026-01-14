@@ -1,82 +1,102 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CRM Dashboard</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <link rel="stylesheet" href="stylesmain/style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CRM Calidad - Scotiabank</title>
+    <link rel="stylesheet" href="styles/main.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
 </head>
 <body>
 
-  <!-- ===== Login ===== -->
-  <div id="loginSection">
-    <h2>Login</h2>
-    <div class="error-msg" id="loginError"></div>
-    <div class="form-group">
-      <label>Usuario</label>
-      <input type="text" id="username">
+    <!-- ========== SECCIÓN LOGIN ========== -->
+    <div id="loginSection" class="login-container">
+        <div class="login-box">
+            <div class="login-header">
+                <h1>CRM Calidad</h1>
+                <p>Sistema de Gestión de Calidad</p>
+            </div>
+            
+            <form id="loginForm" onsubmit="return handleLogin(event)">
+                <div class="form-group">
+                    <label for="username">Usuario</label>
+                    <input type="text" id="username" placeholder="Ingrese su usuario" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">Contraseña</label>
+                    <input type="password" id="password" placeholder="Ingrese su contraseña" required>
+                </div>
+                
+                <div id="loginError" class="error-msg"></div>
+                
+                <button type="submit" class="btn btn-login">Iniciar Sesión</button>
+            </form>
+            
+            <div class="login-help">
+                <p><strong>Demo Usuarios:</strong></p>
+                <p>👤 <strong>calidad</strong> / dejahair</p>
+                <p>👤 <strong>operaciones</strong> / Operaciones2026</p>
+            </div>
+        </div>
     </div>
-    <div class="form-group">
-      <label>Contraseña</label>
-      <input type="password" id="password">
+
+    <!-- ========== SECCIÓN APP (OCULTA INICIALMENTE) ========== -->
+    <div id="appContainer" class="app-container hidden">
+        
+        <!-- SIDEBAR MENÚ -->
+        <aside id="sidebar" class="sidebar">
+            <div class="sidebar-header">
+                <h2>CRM</h2>
+                <p id="userRole" class="user-role"></p>
+            </div>
+            
+            <nav class="sidebar-menu">
+                <button class="menu-btn active" data-section="dashboard" onclick="navigateTo('dashboard')">
+                    📊 Dashboard
+                </button>
+                <button class="menu-btn" id="btnAuditorias" data-section="auditorias" onclick="navigateTo('auditorias')">
+                    ✓ Auditorías
+                </button>
+                <button class="menu-btn" id="btnEjecutivos" data-section="ejecutivos" onclick="navigateTo('ejecutivos')">
+                    👥 Ejecutivos
+                </button>
+                <button class="menu-btn" id="btnReportes" data-section="reportes" onclick="navigateTo('reportes')">
+                    📄 Reportes
+                </button>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <button class="btn btn-logout" onclick="logout()">🚪 Cerrar</button>
+            </div>
+        </aside>
+
+        <!-- CONTENIDO PRINCIPAL -->
+        <main id="mainContent" class="main-content">
+            
+            <!-- Header -->
+            <header class="app-header">
+                <div class="header-left">
+                    <h1 id="pageTitle">Dashboard</h1>
+                </div>
+                <div class="header-right">
+                    <div id="dateTime" class="date-time"></div>
+                </div>
+            </header>
+
+            <!-- Contenido dinámico -->
+            <section id="pageContent" class="page-content">
+                <!-- Se carga dinámicamente -->
+            </section>
+        </main>
     </div>
-    <button class="btn" onclick="login()">Ingresar</button>
-  </div>
 
-  <!-- ===== Aplicación ===== -->
-  <div id="app">
-    <!-- Sidebar -->
-    <aside id="sidebar">
-      <h2>CRM Dashboard</h2>
-      <button id="btnDashboard">Dashboard</button>
-      <button id="btnRanking">Ranking</button>
-      <button id="btnGestionCalidad">Gestión Calidad</button>
-    </aside>
-
-    <!-- Contenido -->
-    <main id="mainContent">
-      <header>
-        <h1>📊 CRM Dashboard</h1>
-        <div id="dateTime"></div>
-      </header>
-
-      <!-- Tabla -->
-      <div id="tableSection" class="table-container">
-        <input type="text" id="searchInput" placeholder="🔍 Buscar...">
-        <table>
-          <thead id="tableHead"></thead>
-          <tbody id="tableBody"></tbody>
-        </table>
-      </div>
-
-      <!-- Ranking -->
-      <div id="rankingSection" class="hidden">
-        <h3>🏆 Ranking por Habilidad Comercial</h3>
-        <table>
-          <thead>
-            <tr>
-              <th>Ejecutivo</th>
-              <th>Habilidad Comercial</th>
-            </tr>
-          </thead>
-          <tbody id="rankingBody"></tbody>
-        </table>
-      </div>
-
-      <!-- Gráficos -->
-      <div class="charts-grid">
-        <div class="chart-container"><canvas id="chart1"></canvas></div>
-        <div class="chart-container"><canvas id="chart2"></canvas></div>
-      </div>
-    </main>
-  </div>
-
-  <!-- Scripts separados -->
-  <script src="scriptstable/table.js"></script>
-  <script src="scriptscharts/charts.js"></script>
-  <script src="scriptsmain/main.js"></script>
+    <!-- Scripts -->
+    <script src="scripts/utils.js"></script>
+    <script src="scripts/main.js"></script>
+    <script src="scripts/table.js"></script>
+    <script src="scripts/charts.js"></script>
+    <script src="scripts/form.js"></script>
 
 </body>
 </html>

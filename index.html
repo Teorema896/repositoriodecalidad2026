@@ -66,7 +66,9 @@
             font-size: 14px;
         }
 
-        .form-group input {
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
             width: 100%;
             padding: 12px 15px;
             border: 2px solid #e0e6ed;
@@ -74,13 +76,26 @@
             font-size: 14px;
             transition: all 0.3s;
             background: #f8f9fa;
+            font-family: inherit;
         }
 
-        .form-group input:focus {
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
             outline: none;
             border-color: #2a5298;
             background: white;
             box-shadow: 0 0 0 4px rgba(42, 82, 152, 0.1);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .form-group.required label::after {
+            content: ' *';
+            color: #e74c3c;
         }
 
         .error-msg {
@@ -95,6 +110,21 @@
         }
 
         .error-msg.show {
+            display: block;
+        }
+
+        .success-msg {
+            display: none;
+            color: #27ae60;
+            background: #d5f4e6;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            font-size: 13px;
+            border-left: 4px solid #27ae60;
+        }
+
+        .success-msg.show {
             display: block;
         }
 
@@ -166,6 +196,7 @@
             height: 100vh;
             left: 0;
             top: 0;
+            z-index: 100;
         }
 
         .sidebar-header {
@@ -318,6 +349,16 @@
             box-shadow: 0 8px 20px rgba(42, 82, 152, 0.25);
         }
 
+        .btn-secondary {
+            background: #ecf0f1;
+            color: #2c3e50;
+            border: 1px solid #bdc3c7;
+        }
+
+        .btn-secondary:hover {
+            background: #d5dbdb;
+        }
+
         .metrics-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
@@ -440,13 +481,124 @@
             font-size: 14px;
         }
 
-        .error-data {
-            text-align: center;
-            padding: 40px;
-            color: #e74c3c;
-            background: #fadbd8;
-            border-radius: 8px;
-            margin: 20px 0;
+        /* ========== MODAL ========== */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.6);
+        }
+
+        .modal.show {
+            display: block;
+        }
+
+        .modal-content {
+            background-color: #fff;
+            margin: 3% auto;
+            padding: 0;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 800px;
+            box-shadow: 0 10px 50px rgba(0, 0, 0, 0.3);
+            max-height: 85vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            padding: 25px 30px;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            border-radius: 12px 12px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h2 {
+            margin: 0;
+            font-size: 22px;
+        }
+
+        .modal-close {
+            background: transparent;
+            border: none;
+            color: white;
+            font-size: 28px;
+            cursor: pointer;
+            padding: 0;
+            width: 35px;
+            height: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: background 0.3s;
+        }
+
+        .modal-close:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .modal-body {
+            padding: 30px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .form-grid .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .form-section {
+            grid-column: 1 / -1;
+            margin: 20px 0 10px;
+            padding-top: 20px;
+            border-top: 2px solid #ecf0f1;
+        }
+
+        .form-section h3 {
+            color: #2a5298;
+            font-size: 16px;
+            margin-bottom: 15px;
+        }
+
+        .radio-group {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .radio-group label {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            cursor: pointer;
+            font-weight: normal;
+        }
+
+        .radio-group input[type="radio"] {
+            width: auto;
+            margin: 0;
+        }
+
+        .form-actions {
+            grid-column: 1 / -1;
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 1px solid #ecf0f1;
         }
 
         @media (max-width: 768px) {
@@ -462,6 +614,15 @@
 
             .metrics-grid, .charts-grid {
                 grid-template-columns: 1fr;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .modal-content {
+                width: 95%;
+                margin: 5% auto;
             }
         }
     </style>
@@ -541,11 +702,223 @@
         </main>
     </div>
 
+    <!-- ========== MODAL FORMULARIO ========== -->
+    <div id="auditoriaModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>📋 Nueva Auditoría de Calidad</h2>
+                <button class="modal-close" onclick="cerrarModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="formMessage"></div>
+                
+                <form id="auditoriaForm" onsubmit="guardarAuditoria(event)">
+                    <div class="form-grid">
+                        <!-- Datos Básicos -->
+                        <div class="form-group required">
+                            <label for="ejecutivo">Ejecutivo</label>
+                            <input type="text" id="ejecutivo" name="ejecutivo" required>
+                        </div>
+
+                        <div class="form-group required">
+                            <label for="supervisor">Supervisor</label>
+                            <select id="supervisor" name="supervisor" required>
+                                <option value="">Seleccionar...</option>
+                                <option value="Ivan Aguirre Córdova">Ivan Aguirre Córdova</option>
+                                <option value="Manuel Temoche">Manuel Temoche</option>
+                                <option value="Marilyn Romero Bernal">Marilyn Romero Bernal</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group required">
+                            <label for="campana">Campaña</label>
+                            <select id="campana" name="campana" required>
+                                <option value="">Seleccionar...</option>
+                                <option value="Deepening">Deepening</option>
+                                <option value="Préstamos">Préstamos</option>
+                                <option value="Tarjetas de Crédito">Tarjetas de Crédito</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group required">
+                            <label for="semana">Semana</label>
+                            <select id="semana" name="semana" required>
+                                <option value="">Seleccionar...</option>
+                                <option value="Semana 1">Semana 1</option>
+                                <option value="Semana 2">Semana 2</option>
+                                <option value="Semana 3">Semana 3</option>
+                                <option value="Semana 4">Semana 4</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group required">
+                            <label for="fechaHora">Fecha y Hora de Llamada</label>
+                            <input type="datetime-local" id="fechaHora" name="fechaHora" required>
+                        </div>
+
+                        <div class="form-group required">
+                            <label for="telefono">Teléfono (9 dígitos)</label>
+                            <input type="text" id="telefono" name="telefono" pattern="[0-9]{9}" maxlength="9" placeholder="999999999" required>
+                        </div>
+
+                        <div class="form-group required full-width">
+                            <label for="tipoLlamada">Tipo de Llamada</label>
+                            <select id="tipoLlamada" name="tipoLlamada" required>
+                                <option value="">Seleccionar...</option>
+                                <option value="Venta">Venta</option>
+                                <option value="No Venta">No Venta</option>
+                            </select>
+                        </div>
+
+                        <!-- Criterios de Evaluación -->
+                        <div class="form-section">
+                            <h3>Criterios de Evaluación</h3>
+                        </div>
+
+                        <div class="form-group required">
+                            <label>Sondea para rebatir al cliente</label>
+                            <div class="radio-group">
+                                <label><input type="radio" name="sondeo" value="SI" required> SI</label>
+                                <label><input type="radio" name="sondeo" value="NO"> NO</label>
+                                <label><input type="radio" name="sondeo" value="NA"> N/A</label>
+                            </div>
+                        </div>
+
+                        <div class="form-group required">
+                            <label>Rebate objecciones o intenta persuadir</label>
+                            <div class="radio-group">
+                                <label><input type="radio" name="rebate" value="SI" required> SI</label>
+                                <label><input type="radio" name="rebate" value="NO"> NO</label>
+                                <label><input type="radio" name="rebate" value="NA"> N/A</label>
+                            </div>
+                        </div>
+
+                        <div class="form-group required">
+                            <label>Genera alguna necesidad al cliente</label>
+                            <div class="radio-group">
+                                <label><input type="radio" name="generaNecesidad" value="SI" required> SI</label>
+                                <label><input type="radio" name="generaNecesidad" value="NO"> NO</label>
+                                <label><input type="radio" name="generaNecesidad" value="NA"> N/A</label>
+                            </div>
+                        </div>
+
+                        <div class="form-group required">
+                            <label>Aplica algún cierre de venta</label>
+                            <div class="radio-group">
+                                <label><input type="radio" name="cierreVenta" value="SI" required> SI</label>
+                                <label><input type="radio" name="cierreVenta" value="NO"> NO</label>
+                                <label><input type="radio" name="cierreVenta" value="NA"> N/A</label>
+                            </div>
+                        </div>
+
+                        <div class="form-group required">
+                            <label>Utiliza la baja como argumento de venta</label>
+                            <div class="radio-group">
+                                <label><input type="radio" name="usaBaja" value="SI" required> SI</label>
+                                <label><input type="radio" name="usaBaja" value="NO"> NO</label>
+                                <label><input type="radio" name="usaBaja" value="NA"> N/A</label>
+                            </div>
+                        </div>
+
+                        <div class="form-group required">
+                            <label>Habilidad Comercial</label>
+                            <div class="radio-group">
+                                <label><input type="radio" name="habilidadComercial" value="SI" required> SI</label>
+                                <label><input type="radio" name="habilidadComercial" value="NO"> NO</label>
+                                <label><input type="radio" name="habilidadComercial" value="NA"> N/A</label>
+                            </div>
+                        </div>
+
+                        <!-- Motivo No Venta -->
+                        <div class="form-section">
+                            <h3>En caso de No Venta</h3>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="motivoNoVenta">Motivo de la No Venta</label>
+                            <select id="motivoNoVenta" name="motivoNoVenta">
+                                <option value="">Seleccionar...</option>
+                                <option value="No usa TC">No usa TC</option>
+                                <option value="% de TEA, TCEA elevado">% de TEA, TCEA elevado</option>
+                                <option value="Línea de crédito ofrecida no es atractiva para cliente">Línea de crédito ofrecida no es atractiva para cliente</option>
+                                <option value="Cliente no presenta deudas, no tiene donde invertir">Cliente no presenta deudas, no tiene donde invertir</option>
+                                <option value="Mala experiencia con el banco">Mala experiencia con el banco</option>
+                                <option value="Tiene muchas TC">Tiene muchas TC</option>
+                                <option value="Llamada agendada">Llamada agendada</option>
+                                <option value="Cliente reacio, no da chance a explicación">Cliente reacio, no da chance a explicación</option>
+                                <option value="Desea acercarse a la agencia">Desea acercarse a la agencia</option>
+                                <option value="Gestión del agente no es la adecuada">Gestión del agente no es la adecuada</option>
+                                <option value="Venta realizada">Venta realizada</option>
+                                <option value="Cliente corta llamada sin motivo">Cliente corta llamada sin motivo</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="responsabilidad">Responsabilidad No Venta</label>
+                            <select id="responsabilidad" name="responsabilidad">
+                                <option value="">Seleccionar...</option>
+                                <option value="Agente">Agente</option>
+                                <option value="Banco">Banco</option>
+                                <option value="Cliente">Cliente</option>
+                                <option value="N/A">N/A</option>
+                            </select>
+                        </div>
+
+                        <!-- Observaciones -->
+                        <div class="form-section">
+                            <h3>Observaciones y Recomendaciones</h3>
+                        </div>
+
+                        <div class="form-group full-width">
+                            <label for="observacionesPositivas">Observaciones Positivas</label>
+                            <textarea id="observacionesPositivas" name="observacionesPositivas"></textarea>
+                        </div>
+
+                        <div class="form-group full-width">
+                            <label for="observacionesMejora">Observaciones de Mejora</label>
+                            <textarea id="observacionesMejora" name="observacionesMejora"></textarea>
+                        </div>
+
+                        <div class="form-group full-width">
+                            <label for="recomendaciones">Recomendaciones Generales</label>
+                            <textarea id="recomendaciones" name="recomendaciones"></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="fechaEvaluacion">Fecha de Evaluación</label>
+                            <input type="date" id="fechaEvaluacion" name="fechaEvaluacion" value="">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="feedback">Feedback</label>
+                            <input type="text" id="feedback" name="feedback">
+                        </div>
+
+                        <div class="form-group full-width">
+                            <label for="audio">Audio (URL o enlace)</label>
+                            <input type="text" id="audio" name="audio" placeholder="https://...">
+                        </div>
+
+                        <!-- Botones -->
+                        <div class="form-actions">
+                            <button type="button" class="btn btn-secondary" onclick="cerrarModal()">Cancelar</button>
+                            <button type="submit" class="btn btn-primary">Guardar Auditoría</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <script>
         // ===== CONFIGURACIÓN GOOGLE SHEETS =====
         const SHEET_ID = '1ISly1GKF3H24h089PFbu-oJ7Tuvs6Pt8_gkLD_yeeAs';
         const SHEET_NAME = 'BD';
         const SHEET_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=${SHEET_NAME}`;
+
+        // URL para enviar datos (Google Apps Script Web App)
+        // Necesitarás crear esto después si quieres guardar en el Sheet
+        const APPS_SCRIPT_URL = ''; // Lo configuraremos después
 
         // ===== USERS =====
         const USERS = {
@@ -687,6 +1060,51 @@
             }
         }
 
+        // ===== ABRIR MODAL FORMULARIO =====
+        function abrirModalAuditoria() {
+            document.getElementById('auditoriaModal').classList.add('show');
+            document.getElementById('auditoriaForm').reset();
+            document.getElementById('formMessage').innerHTML = '';
+            
+            // Establecer fecha de hoy por defecto
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('fechaEvaluacion').value = today;
+        }
+
+        // ===== CERRAR MODAL =====
+        function cerrarModal() {
+            document.getElementById('auditoriaModal').classList.remove('show');
+        }
+
+        // ===== GUARDAR AUDITORÍA =====
+        function guardarAuditoria(event) {
+            event.preventDefault();
+            
+            const formData = new FormData(event.target);
+            const data = {};
+            formData.forEach((value, key) => {
+                data[key] = value;
+            });
+
+            const messageDiv = document.getElementById('formMessage');
+            
+            // Mostrar mensaje de éxito
+            messageDiv.innerHTML = '<div class="success-msg show">✅ Auditoría guardada correctamente en local. Para guardar en Google Sheets, configuraremos el backend en el siguiente paso.</div>';
+            
+            // Agregar al array local (temporal)
+            sheetData.unshift(data);
+            
+            // Cerrar modal después de 2 segundos
+            setTimeout(() => {
+                cerrarModal();
+                if (currentUser.role === 'calidad') {
+                    navigateTo('gestion_calidad');
+                }
+            }, 2000);
+
+            return false;
+        }
+
         // ===== CALCULAR MÉTRICAS DESDE SHEET =====
         function calcularMetricas() {
             const total = sheetData.length;
@@ -746,7 +1164,6 @@
 
         // ===== RANKING CONTENT =====
         function getRankingContent() {
-            // Agrupar por ejecutivo y calcular promedio
             const ejecutivosMap = {};
             
             sheetData.forEach(row => {
@@ -769,7 +1186,6 @@
                 }
             });
 
-            // Convertir a array y calcular promedio
             const ranking = Object.values(ejecutivosMap).map(ej => {
                 return {
                     ...ej,
@@ -836,7 +1252,7 @@
             return `
                 <div class="section-header">
                     <h2>Gestión de Auditorías</h2>
-                    <button class="btn btn-primary" onclick="alert('Formulario próximamente')">
+                    <button class="btn btn-primary" onclick="abrirModalAuditoria()">
                         + Nueva Auditoría
                     </button>
                 </div>
@@ -909,7 +1325,6 @@
             const ctx = document.getElementById('chartRanking');
             if (!ctx) return;
 
-            // Calcular ranking
             const ejecutivosMap = {};
             sheetData.forEach(row => {
                 const ej = row.ejecutivo;

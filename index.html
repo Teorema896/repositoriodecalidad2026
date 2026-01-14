@@ -1,49 +1,82 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CRM Dashboard</title>
-
-    <!-- Estilos principales -->
-    <link rel="stylesheet" href="./stylesmain/style.css">
-
-    <!-- Librerías opcionales -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CRM Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="stylesheet" href="stylesmain/style.css">
 </head>
 <body>
+
+  <!-- ===== Login ===== -->
+  <div id="loginSection">
+    <h2>Login</h2>
+    <div class="error-msg" id="loginError"></div>
+    <div class="form-group">
+      <label>Usuario</label>
+      <input type="text" id="username">
+    </div>
+    <div class="form-group">
+      <label>Contraseña</label>
+      <input type="password" id="password">
+    </div>
+    <button class="btn" onclick="login()">Ingresar</button>
+  </div>
+
+  <!-- ===== Aplicación ===== -->
+  <div id="app">
     <!-- Sidebar -->
     <aside id="sidebar">
-        <h2>CRM Dashboard</h2>
-        <ul>
-            <li class="menu-btn" data-role="calidad" id="btnGestionCalidad">Gestión Calidad</li>
-            <li class="menu-btn" data-role="operaciones" id="btnDashboard">Dashboard</li>
-            <li class="menu-btn" data-role="operaciones" id="btnRanking">Ranking</li>
-        </ul>
+      <h2>CRM Dashboard</h2>
+      <button id="btnDashboard">Dashboard</button>
+      <button id="btnRanking">Ranking</button>
+      <button id="btnGestionCalidad">Gestión Calidad</button>
     </aside>
 
-    <!-- Contenido principal -->
-    <main id="main-content">
-        <section id="login-section">
-            <h3>Login</h3>
-            <input type="text" id="username" placeholder="Usuario">
-            <input type="password" id="password" placeholder="Contraseña">
-            <button id="loginBtn">Ingresar</button>
-            <p id="login-error" style="color:red;"></p>
-        </section>
+    <!-- Contenido -->
+    <main id="mainContent">
+      <header>
+        <h1>📊 CRM Dashboard</h1>
+        <div id="dateTime"></div>
+      </header>
 
-        <section id="dashboard-section" style="display:none;">
-            <h3>Bienvenido al CRM</h3>
-            <p>Aquí se mostrará información según el botón que selecciones.</p>
-        </section>
+      <!-- Tabla -->
+      <div id="tableSection" class="table-container">
+        <input type="text" id="searchInput" placeholder="🔍 Buscar...">
+        <table>
+          <thead id="tableHead"></thead>
+          <tbody id="tableBody"></tbody>
+        </table>
+      </div>
+
+      <!-- Ranking -->
+      <div id="rankingSection" class="hidden">
+        <h3>🏆 Ranking por Habilidad Comercial</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Ejecutivo</th>
+              <th>Habilidad Comercial</th>
+            </tr>
+          </thead>
+          <tbody id="rankingBody"></tbody>
+        </table>
+      </div>
+
+      <!-- Gráficos -->
+      <div class="charts-grid">
+        <div class="chart-container"><canvas id="chart1"></canvas></div>
+        <div class="chart-container"><canvas id="chart2"></canvas></div>
+      </div>
     </main>
+  </div>
 
-    <!-- Scripts -->
-    <script src="./scriptsmain/main.js" defer></script>
-    <script src="./scriptstable/table.js" defer></script>
-    <script src="./scriptscharts/charts.js" defer></script>
-    <script src="./scriptsform/form.js" defer></script>
-    <script src="./scriptsapi/api.js" defer></script>
-    <script src="./scriptsutils/utils.js" defer></script>
+  <!-- Scripts separados -->
+  <script src="scriptstable/table.js"></script>
+  <script src="scriptscharts/charts.js"></script>
+  <script src="scriptsmain/main.js"></script>
+
 </body>
 </html>

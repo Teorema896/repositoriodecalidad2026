@@ -9,22 +9,429 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-    <!-- Login Overlay -->
+    <!-- Login Overlay (aparece primero) -->
     <div id="loginOverlay" class="login-overlay">
-        <!-- Contenido del login -->
+        <div class="login-card">
+            <div class="login-brand">
+                <img class="login-logo" src="https://commons.wikimedia.org/wiki/Special:FilePath/Scotiabank_logo.svg" alt="Scotiabank">
+                <div class="login-tag">PERÚ</div>
+            </div>
+            <div class="login-title">GESTIÓN CALIDAD SCOTIABANK</div>
+            <div class="login-subtitle">Acceso visual para uso interno. Ingresa usuario y contraseña.</div>
+            
+            <div class="login-grid">
+                <div class="login-group">
+                    <label class="login-label" for="loginUser">Usuario</label>
+                    <input id="loginUser" class="login-input" type="text" placeholder="Ej: ops01" autocomplete="username">
+                </div>
+                <div class="login-group">
+                    <label class="login-label" for="loginPass">Contraseña</label>
+                    <input id="loginPass" class="login-input" type="password" placeholder="••••••••" autocomplete="current-password">
+                </div>
+            </div>
+            
+            <div id="loginMsg" class="login-msg" style="display:none;"></div>
+            
+            <div class="login-actions">
+                <button class="btn btn-primary" type="button" onclick="handleLogin()">Ingresar</button>
+                <button class="btn btn-secondary" type="button" onclick="toggleLoginHelp()">¿Usuarios?</button>
+            </div>
+            
+            <div id="loginHelp" class="login-help" style="display:none;">
+                <div style="font-weight:800; margin-bottom:6px;">Perfiles de acceso (editable)</div>
+                <ul style="margin:0; padding-left:18px;">
+                    <li><b>Operaciones</b>: Dashboard, Feedback, Análisis.</li>
+                    <li><b>Calidad</b>: Gestión Calidad.</li>
+                </ul>
+                <div style="margin-top:8px; font-size:11px; color:var(--color-text-secondary);">
+                    Edita usuarios/clave en el bloque <code>USER_DB</code> del script login.js.
+                </div>
+            </div>
+            
+            <div class="login-foot">
+                Esta pantalla es una máscara UI (no reemplaza controles de acceso reales).
+            </div>
+        </div>
     </div>
 
-    <!-- Main App (oculto inicialmente) -->
+    <!-- Main App (oculto hasta login) -->
     <div id="mainApp" class="app-layout" style="display: none;">
-        <!-- Sidebar y contenido principal -->
+        <aside class="sidebar" aria-label="Menú">
+            <div class="sidebar-header">Menú</div>
+            <button class="sidebar-link" type="button" onclick="logout()">
+                <span class="sidebar-ico" aria-hidden="true">🔒</span>
+                <span class="sidebar-text">Cerrar sesión</span>
+            </button>
+            <button class="sidebar-link active" type="button" data-tab="dashboard" onclick="switchTab('dashboard')">
+                <span class="sidebar-ico" aria-hidden="true">📊</span>
+                <span class="sidebar-text">Dashboard</span>
+            </button>
+            <button class="sidebar-link" type="button" data-tab="feedback" onclick="switchTab('feedback')">
+                <span class="sidebar-ico" aria-hidden="true">💬</span>
+                <span class="sidebar-text">Feedback</span>
+            </button>
+            <button class="sidebar-link" type="button" data-tab="analisis" onclick="switchTab('analisis')">
+                <span class="sidebar-ico" aria-hidden="true">📈</span>
+                <span class="sidebar-text">Análisis</span>
+            </button>
+            <button class="sidebar-link" type="button" data-tab="gestion" onclick="switchTab('gestion')">
+                <span class="sidebar-ico" aria-hidden="true">⚙️</span>
+                <span class="sidebar-text">Gestión Calidad</span>
+            </button>
+        </aside>
+        
+        <main class="app-main">
+            <div class="container">
+                <!-- Header -->
+                <header>
+                    <h1>📊 Dashboard de Calidad - Scotiabank</h1>
+                    <p class="subtitle">Sistema de Auditoría y Seguimiento de Llamadas</p>
+                    <div style="margin-top: 12px; padding: 8px 12px; background: rgba(50, 184, 198, 0.1); border-radius: 6px; font-size: 11px; color: var(--color-text-secondary);">
+                        📌 Versión 3.5 | <span id="lastUpdate">Esperando datos...</span>
+                    </div>
+                </header>
+
+                <!-- Fecha y Hora -->
+                <div class="fecha-actual-box">
+                    <div>
+                        <div class="fecha-label">📅 Fecha de Evaluación</div>
+                        <div class="fecha-valor" id="fechaActual"></div>
+                    </div>
+                    <div style="text-align: right;">
+                        <div class="fecha-label">🕐 Hora actual</div>
+                        <div class="fecha-valor" id="horaActual" style="font-size: 18px;"></div>
+                    </div>
+                </div>
+
+                <!-- ===== DASHBOARD ===== -->
+                <div id="dashboard" class="tab-content active">
+                    <div id="loadingMessage" class="loading">🔄 Cargando datos desde Google Sheets...</div>
+                    <div id="messageContainer"></div>
+
+                    <!-- Filtros Dashboard -->
+                    <div class="filter-section">
+                        <div class="filter-grid">
+                            <div class="filter-group">
+                                <label class="filter-label">🔍 Filtrar por Ejecutivo</label>
+                                <select id="ejecutivoFilter" class="form-control">
+                                    <option value="">Todos los ejecutivos</option>
+                                </select>
+                            </div>
+                            <div class="filter-group">
+                                <label class="filter-label">📋 Filtrar por Campaña</label>
+                                <select id="campanaFilter" class="form-control">
+                                    <option value="">Todas las campañas</option>
+                                    <option value="Préstamos">Préstamos</option>
+                                    <option value="Deepening">Deepening</option>
+                                </select>
+                            </div>
+                            <div class="filter-group">
+                                <label class="filter-label">&nbsp;</label>
+                                <button class="btn btn-secondary" type="button" onclick="clearFilters()">🗑️ Limpiar Filtros</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- KPIs -->
+                    <div class="kpis-wrapper" id="kpisContainer">
+                        <!-- Se llena con JavaScript -->
+                    </div>
+
+                    <!-- Botones de Acción -->
+                    <div class="actions">
+                        <button class="btn btn-secondary" type="button" onclick="exportToCSV()">📥 Exportar a CSV</button>
+                        <button class="btn btn-secondary" type="button" onclick="mostrarRanking()">🏆 Ranking</button>
+                    </div>
+
+                    <!-- Gráficos -->
+                    <div class="charts-grid" id="chartsContainer">
+                        <!-- Se llena con JavaScript -->
+                    </div>
+
+                    <!-- Tabla Principal -->
+                    <div class="table-container">
+                        <input type="text" class="search-box" placeholder="🔍 Buscar..." id="searchInput">
+                        <table>
+                            <thead id="tableHead">
+                                <tr><th>Cargando datos...</th></tr>
+                            </thead>
+                            <tbody id="tableBody"></tbody>
+                        </table>
+                        <!-- Paginación -->
+                        <div id="paginationControls" style="display: none; margin-top: 12px;">
+                            <button class="btn btn-secondary btn-sm" id="prevPageBtn">Anterior</button>
+                            <span id="pageInfo" style="margin: 0 12px;"></span>
+                            <button class="btn btn-secondary btn-sm" id="nextPageBtn">Siguiente</button>
+                        </div>
+                    </div>
+
+                    <!-- Ranking (oculto inicialmente) -->
+                    <div class="table-container" id="rankingContainer" style="display:none;">
+                        <h2 class="section-title">🏆 Ranking de Ejecutivos</h2>
+                        <button class="btn btn-secondary btn-sm" type="button" onclick="volverAlDashboard()" style="margin-bottom: 12px;">← Volver al Dashboard</button>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Ejecutivo</th>
+                                    <th>% Promedio Evaluación</th>
+                                    <th>Total Auditorías</th>
+                                </tr>
+                            </thead>
+                            <tbody id="rankingTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- ===== FEEDBACK ===== -->
+                <div id="feedback" class="tab-content">
+                    <div class="feedback-section">
+                        <h2 class="feedback-title">📝 Feedback y Observaciones</h2>
+                        <p class="feedback-subtitle">Consulta las observaciones positivas y oportunidades de mejora por ejecutivo.</p>
+
+                        <!-- Filtros Feedback -->
+                        <div class="filter-section">
+                            <div class="filter-grid">
+                                <div class="filter-group">
+                                    <label class="filter-label">👤 Ejecutivo</label>
+                                    <select id="feedbackEjecutivoFilter" class="form-control">
+                                        <option value="">Selecciona un ejecutivo...</option>
+                                    </select>
+                                </div>
+                                <div class="filter-group">
+                                    <label class="filter-label">📋 Campaña</label>
+                                    <select id="feedbackCampanaFilter" class="form-control">
+                                        <option value="">Todas las campañas</option>
+                                    </select>
+                                </div>
+                                <div class="filter-group">
+                                    <label class="filter-label">👁️ Supervisor</label>
+                                    <select id="feedbackSupervisorFilter" class="form-control">
+                                        <option value="">Todos los supervisores</option>
+                                    </select>
+                                </div>
+                                <div class="filter-group">
+                                    <label class="filter-label">📅 Fecha</label>
+                                    <select id="feedbackFechaFilter" class="form-control">
+                                        <option value="">Todas las fechas</option>
+                                    </select>
+                                </div>
+                                <div class="filter-group">
+                                    <label class="filter-label">☎️ Teléfono</label>
+                                    <select id="feedbackTelefonoFilter" class="form-control">
+                                        <option value="">Todos los teléfonos</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Botón Ver -->
+                        <div style="margin-top: 24px; padding: 16px; background: var(--color-surface); border-radius: 8px; border: 1px solid var(--color-border);">
+                            <button class="btn btn-primary" type="button" onclick="cargarObservaciones()" style="background-color: var(--color-primary); color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-weight: bold; font-size: 14px; display: flex; align-items: center; gap: 8px;">
+                                👁️ VER OBSERVACIONES
+                            </button>
+                        </div>
+
+                        <!-- Estado vacío -->
+                        <div id="feedbackEmptyState" style="text-align: center; padding: 40px; color: var(--color-text-secondary);">
+                            Selecciona un ejecutivo para ver sus observaciones.
+                        </div>
+
+                        <!-- Contenedor de resultados -->
+                        <div id="feedbackResults" style="display: none; margin-top: 24px;">
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                                <!-- Positivas -->
+                                <div style="border: 1px solid #10b981; border-radius: 8px; overflow: hidden;">
+                                    <div style="background: rgba(16, 185, 129, 0.1); color: #10b981; padding: 12px; font-weight: bold;">
+                                        🌟 Observaciones Positivas
+                                    </div>
+                                    <div id="positiveContainer" style="padding: 16px; max-height: 400px; overflow-y: auto;"></div>
+                                </div>
+                                <!-- Mejora -->
+                                <div style="border: 1px solid #ef4444; border-radius: 8px; overflow: hidden;">
+                                    <div style="background: rgba(239, 68, 68, 0.1); color: #ef4444; padding: 12px; font-weight: bold;">
+                                        🚀 Oportunidades de Mejora
+                                    </div>
+                                    <div id="improvementContainer" style="padding: 16px; max-height: 400px; overflow-y: auto;"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ===== ANÁLISIS ===== -->
+                <div id="analisis" class="tab-content">
+                    <div class="kpis-section" style="margin-bottom: 16px;">
+                        <div class="kpis-section-title">Análisis de auditorías (ventas telefónicas)</div>
+                        <div style="font-size: 13px; color: var(--color-text-secondary);">
+                            Hallazgos accionables basados en los filtros actuales del Dashboard.
+                        </div>
+                    </div>
+
+                    <!-- KPIs Análisis -->
+                    <div class="kpis-wrapper" id="analysisKpis"></div>
+
+                    <!-- Gráficos Análisis -->
+                    <div class="charts-grid" id="analysisCharts">
+                        <div class="chart-container"><canvas id="analysisChart1"></canvas></div>
+                        <div class="chart-container"><canvas id="analysisChart2"></canvas></div>
+                        <div class="chart-container"><canvas id="analysisChart3"></canvas></div>
+                        <div class="chart-container"><canvas id="analysisChart4"></canvas></div>
+                        <div class="chart-container"><canvas id="analysisChart5"></canvas></div>
+                        <div class="chart-container"><canvas id="analysisChart6"></canvas></div>
+                    </div>
+
+                    <!-- Narrativa -->
+                    <div class="table-container">
+                        <div style="display:flex; justify-content: space-between; align-items:center; gap:12px;">
+                            <div style="font-weight:700; color: var(--color-primary);">Narrativa y acciones sugeridas</div>
+                            <button class="btn btn-secondary btn-sm" type="button" onclick="renderAnalysis()">Actualizar análisis</button>
+                        </div>
+                        <div id="analysisNarrative" style="margin-top: 12px;"></div>
+                    </div>
+                </div>
+
+                <!-- ===== GESTIÓN CALIDAD ===== -->
+                <div id="gestion" class="tab-content">
+                    <div class="form-section">
+                        <h2 class="section-title">Nueva Auditoría</h2>
+                        <form id="auditForm">
+                            <!-- Información Básica -->
+                            <div class="section-title">Información Básica</div>
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label class="form-label">Ejecutivo *</label>
+                                    <input type="text" name="ejecutivo" class="form-control" required>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Supervisor *</label>
+                                    <select name="supervisor" class="form-control" required>
+                                        <option value="">Seleccionar...</option>
+                                        <option value="Ivan Aguirre Córdova">Ivan Aguirre Córdova</option>
+                                        <option value="Ronny Paliza Cabezas">Ronny Paliza Cabezas</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Campaña *</label>
+                                    <select name="campana" class="form-control" required>
+                                        <option value="">Seleccionar...</option>
+                                        <option value="Deepening">Deepening</option>
+                                        <option value="Préstamos">Préstamos</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Semana *</label>
+                                    <select name="semana" class="form-control" required>
+                                        <option value="">Seleccionar...</option>
+                                        <option value="Semana 1">Semana 1</option>
+                                        <option value="Semana 2">Semana 2</option>
+                                        <option value="Semana 3">Semana 3</option>
+                                        <option value="Semana 4">Semana 4</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Teléfono evaluado *</label>
+                                    <input type="text" name="telefono" class="form-control" required>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Tipo de Llamada *</label>
+                                    <select name="tipoLlamada" class="form-control" required>
+                                        <option value="">Seleccionar...</option>
+                                        <option value="Venta">Venta</option>
+                                        <option value="No Venta">No Venta</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Evaluación de Habilidades -->
+                            <div class="section-title">Evaluación de Habilidades Comerciales</div>
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label class="form-label">Sondeo</label>
+                                    <select name="sondeo" class="form-control">
+                                        <option value="NA">NA</option>
+                                        <option value="SI">SI</option>
+                                        <option value="NO">NO</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Rebate</label>
+                                    <select name="rebate" class="form-control">
+                                        <option value="NA">NA</option>
+                                        <option value="SI">SI</option>
+                                        <option value="NO">NO</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Genera Necesidad</label>
+                                    <select name="generaNecesidad" class="form-control">
+                                        <option value="NA">NA</option>
+                                        <option value="SI">SI</option>
+                                        <option value="NO">NO</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Cierre de Venta</label>
+                                    <select name="cierreVenta" class="form-control">
+                                        <option value="NA">NA</option>
+                                        <option value="SI">SI</option>
+                                        <option value="NO">NO</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Habilidad comercial</label>
+                                    <select name="habilidadComercial" class="form-control">
+                                        <option value="NA">NA</option>
+                                        <option value="SI">SI</option>
+                                        <option value="NO">NO</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Observaciones -->
+                            <div class="section-title">Observaciones</div>
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label class="form-label">Observaciones Positivas *</label>
+                                    <textarea name="observacionesPositivas" class="form-control" required></textarea>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Observaciones Mejora *</label>
+                                    <textarea name="observacionesMejora" class="form-control" required></textarea>
+                                </div>
+                            </div>
+
+                            <!-- Botones -->
+                            <div class="actions">
+                                <button type="submit" class="btn btn-primary">💾 Guardar Auditoría</button>
+                                <button type="reset" class="btn btn-secondary">Limpiar Formulario</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal Detalles -->
+    <div id="detailModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span>📋 Detalles de Auditoría</span>
+                <button class="modal-close" onclick="closeModal()">✕</button>
+            </div>
+            <div id="modalBody"></div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal()">Cerrar</button>
+            </div>
+        </div>
     </div>
 
     <!-- Scripts -->
-    <script src="js/variables.js"></script>
     <script src="js/login.js"></script>
     <script src="js/main.js"></script>
     <script src="js/dashboard.js"></script>
     <script src="js/feedback.js"></script>
-    <script src="js/charts.js"></script>
+    <script src="js/analysis.js"></script>
+    <script src="js/gestion.js"></script>
 </body>
 </html>

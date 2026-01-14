@@ -855,3 +855,279 @@ tbody tr:hover {
         width: 100%;
     }
 }
+/* ========== ESTILOS PARA RANKING ========== */
+
+.ranking-section {
+    background: var(--color-surface);
+    border-radius: 12px;
+    padding: 30px;
+    border: 1px solid var(--color-border);
+}
+
+.ranking-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.ranking-header h2 {
+    color: var(--color-primary);
+    font-size: 28px;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.ranking-icon {
+    font-size: 32px;
+}
+
+.ranking-subtitle {
+    color: var(--color-text-secondary);
+    font-size: 14px;
+}
+
+.ranking-info {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.info-card {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 20px;
+    background: var(--color-background);
+    border-radius: 10px;
+    border: 1px solid var(--color-border);
+}
+
+.info-icon {
+    font-size: 24px;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(33, 128, 141, 0.1);
+    border-radius: 10px;
+    color: var(--color-primary);
+}
+
+.info-title {
+    font-weight: 700;
+    color: var(--color-text);
+    margin-bottom: 5px;
+}
+
+.info-text {
+    font-size: 13px;
+    color: var(--color-text-secondary);
+    line-height: 1.4;
+}
+
+.ranking-table-container {
+    overflow-x: auto;
+    margin-bottom: 30px;
+}
+
+.ranking-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+}
+
+.ranking-table th {
+    background: var(--color-background);
+    color: var(--color-text);
+    font-weight: 700;
+    padding: 16px;
+    border-bottom: 2px solid var(--color-border);
+    text-align: left;
+    white-space: nowrap;
+}
+
+.ranking-table td {
+    padding: 16px;
+    border-bottom: 1px solid var(--color-border);
+    vertical-align: middle;
+}
+
+.ranking-table tbody tr:hover {
+    background: rgba(33, 128, 141, 0.05);
+}
+
+.ranking-table tbody tr.top-performer {
+    background: linear-gradient(90deg, rgba(255, 215, 0, 0.1) 0%, rgba(255, 215, 0, 0.05) 100%);
+    border-left: 3px solid #FFD700;
+}
+
+.ranking-position {
+    text-align: center;
+    font-weight: 700;
+    font-size: 18px;
+    width: 50px;
+}
+
+.position-number {
+    display: inline-block;
+    width: 30px;
+    height: 30px;
+    background: var(--color-background);
+    border: 1px solid var(--color-border);
+    border-radius: 50%;
+    line-height: 30px;
+    text-align: center;
+    font-size: 14px;
+}
+
+.ejecutivo-name {
+    font-weight: 600;
+    min-width: 200px;
+}
+
+.badge-experiencia {
+    display: inline-block;
+    margin-left: 8px;
+    padding: 2px 8px;
+    background: rgba(33, 128, 141, 0.1);
+    color: var(--color-primary);
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.puntuacion {
+    min-width: 150px;
+}
+
+.progress-bar-container {
+    position: relative;
+    height: 30px;
+    background: var(--color-background);
+    border-radius: 15px;
+    overflow: hidden;
+    border: 1px solid var(--color-border);
+}
+
+.progress-bar {
+    height: 100%;
+    border-radius: 15px;
+    transition: width 0.5s ease;
+}
+
+.puntuacion-text {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    color: white;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+}
+
+.nota {
+    text-align: center;
+}
+
+.nota-badge {
+    display: inline-block;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-weight: 800;
+    font-size: 13px;
+    min-width: 40px;
+}
+
+.auditorias, .ventas, .habilidades {
+    text-align: center;
+    font-weight: 600;
+}
+
+.mini-bar {
+    width: 80px;
+    height: 6px;
+    background: var(--color-background);
+    border-radius: 3px;
+    overflow: hidden;
+    margin: 5px auto 0;
+}
+
+.mini-bar div {
+    height: 100%;
+    border-radius: 3px;
+}
+
+.ranking-footer {
+    border-top: 1px solid var(--color-border);
+    padding-top: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.footer-actions {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.footer-stats {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.stat-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.stat-label {
+    font-size: 12px;
+    color: var(--color-text-secondary);
+    margin-bottom: 4px;
+}
+
+.stat-value {
+    font-size: 18px;
+    font-weight: 800;
+    color: var(--color-primary);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .ranking-info {
+        grid-template-columns: 1fr;
+    }
+    
+    .ranking-table th,
+    .ranking-table td {
+        padding: 12px 8px;
+        font-size: 13px;
+    }
+    
+    .ranking-footer {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .footer-actions {
+        justify-content: center;
+    }
+    
+    .footer-stats {
+        justify-content: center;
+    }
+}
+

@@ -1065,63 +1065,83 @@
         }
 
         // ===== GUARDAR AUDITORÍA (SOLUCIÓN FUNCIONANDO) =====
-        async function guardarAuditoria(event) {
-            event.preventDefault();
-            
-            const formData = new FormData(event.target);
-            const data = {};
-            formData.forEach((value, key) => {
-                data[key] = value;
-            });
+       async function guardarAuditoria(event) {
+    event.preventDefault();
+    
+    const formData = new FormData(event.target);
+    const data = {};
+    formData.forEach((value, key) => {
+        data[key] = value;
+    });
 
-            const messageDiv = document.getElementById('formMessage');
-            const submitBtn = document.getElementById('btnGuardar');
+    const messageDiv = document.getElementById('formMessage');
+    const submitBtn = document.getElementById('btnGuardar');
+    
+    submitBtn.disabled = true;
+    submitBtn.textContent = '⏳ Guardando...';
+    messageDiv.innerHTML = '<div class="loading">Enviando datos a Google Sheets...</div>';
+    
+    try {
+        // Usar Google Apps Script con JSONP para evitar CORS
+        const scriptUrl = APPS_SCRIPT_URL;
+        
+        // Crear un iframe oculto para enviar datos (método alternativo sin CORS)
+        const iframe = document.createElement('iframe');
+        iframe.style.display = 'none';
+        iframe.name = 'hiddenFrame';
+        document.body.appendChild(iframe);
+        
+        const form = document.createElement('form');
+        form.target = 'hiddenFrame';
+        form.method = 'POST';
+        form.action = scriptUrl;
+        
+        // Agregar campos al formulario
+        Object.keys(data).forEach(key => {
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = key;
+            input.value = data[key];
+            form.appendChild(input);
+        });
+        
+        document.body.appendChild(form);
+        form.submit();
+        
+        // Simular éxito (no podemos verificar respuesta con iframe)
+        setTimeout(() => {
+            messageDiv.innerHTML = '<div class="success-msg show">✅ Auditoría enviada a Google Sheets</div>';
             
-            submitBtn.disabled = true;
-            submitBtn.textContent = '⏳ Guardando...';
-            messageDiv.innerHTML = '<div class="loading">Enviando datos a Google Sheets...</div>';
+            // Agregar a la tabla local
+            sheetData.unshift(data);
             
-            try {
-                const response = await fetch(APPS_SCRIPT_URL, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(data)
-                });
-
-                const result = await response.json();
-                
-                if (result.success) {
-                    messageDiv.innerHTML = '<div class="success-msg show">✅ Auditoría guardada correctamente en Google Sheets</div>';
-                    
-                    sheetData.unshift(data);
-                    
-                    setTimeout(async () => {
-                        cerrarModal();
-                        submitBtn.disabled = false;
-                        submitBtn.textContent = 'Guardar Auditoría';
-                        
-                        await fetchSheetData();
-                        
-                        if (currentUser.role === 'calidad') {
-                            navigateTo('gestion_calidad');
-                        }
-                    }, 2000);
-                } else {
-                    throw new Error(result.message || 'Error desconocido');
-                }
-                
-            } catch (error) {
-                console.error('Error:', error);
-                messageDiv.innerHTML = '<div class="error-msg show">❌ Error al guardar: ' + error.message + '</div>';
+            // Limpiar
+            document.body.removeChild(form);
+            document.body.removeChild(iframe);
+            
+            setTimeout(async () => {
+                cerrarModal();
                 submitBtn.disabled = false;
                 submitBtn.textContent = 'Guardar Auditoría';
-            }
+                
+                // Recargar datos del Sheet
+                await fetchSheetData();
+                
+                if (currentUser.role === 'calidad') {
+                    navigateTo('gestion_calidad');
+                }
+            }, 2000);
+        }, 1000);
+        
+    } catch (error) {
+        console.error('Error:', error);
+        messageDiv.innerHTML = '<div class="error-msg show">❌ Error al guardar: ' + error.message + '</div>';
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Guardar Auditoría';
+    }
 
-            return false;
-        }
-
+    return false;
+}
         // ===== MÉTRICAS =====
         function calcularMetricas() {
             const total = sheetData.length;

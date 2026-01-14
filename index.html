@@ -144,7 +144,6 @@
             font-size: 13px;
         }
 
-        /* ========== APP CONTAINER ========== */
         .app-container {
             display: flex;
             min-height: 100vh;
@@ -246,7 +245,6 @@
             background: #c0392b;
         }
 
-        /* ========== MAIN CONTENT ========== */
         .main-content {
             flex: 1;
             margin-left: 260px;
@@ -285,7 +283,6 @@
             overflow-y: auto;
         }
 
-        /* ========== SECTION HEADER ========== */
         .section-header {
             display: flex;
             justify-content: space-between;
@@ -321,17 +318,6 @@
             box-shadow: 0 8px 20px rgba(42, 82, 152, 0.25);
         }
 
-        .btn-secondary {
-            background: #ecf0f1;
-            color: #2c3e50;
-            border: 1px solid #bdc3c7;
-        }
-
-        .btn-secondary:hover {
-            background: #d5dbdb;
-        }
-
-        /* ========== METRICS GRID ========== */
         .metrics-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
@@ -375,7 +361,6 @@
             margin-top: 10px;
         }
 
-        /* ========== CHARTS GRID ========== */
         .charts-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
@@ -397,7 +382,6 @@
             margin-bottom: 20px;
         }
 
-        /* ========== TABLE ========== */
         .table-container {
             background: white;
             padding: 25px;
@@ -449,22 +433,31 @@
             color: #f39c12;
         }
 
-        /* ========== RESPONSIVE ========== */
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+
+        .error-data {
+            text-align: center;
+            padding: 40px;
+            color: #e74c3c;
+            background: #fadbd8;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
         @media (max-width: 768px) {
             .sidebar {
                 position: static;
                 width: 100%;
                 height: auto;
-                flex-direction: row;
             }
 
             .main-content {
                 margin-left: 0;
-            }
-
-            .sidebar-menu {
-                flex-direction: row;
-                overflow-x: auto;
             }
 
             .metrics-grid, .charts-grid {
@@ -509,7 +502,6 @@
 
     <!-- ========== APP ========== -->
     <div id="appContainer" class="app-container hidden">
-        <!-- SIDEBAR -->
         <aside class="sidebar">
             <div class="sidebar-header">
                 <h2>CRM Calidad</h2>
@@ -517,7 +509,6 @@
             </div>
 
             <nav class="sidebar-menu">
-                <!-- Botones, se mostrarán/ocultarán por rol -->
                 <button class="menu-btn active" id="btnDashboard" data-section="dashboard" onclick="navigateTo('dashboard')">
                     📊 Dashboard
                 </button>
@@ -534,7 +525,6 @@
             </div>
         </aside>
 
-        <!-- MAIN CONTENT -->
         <main class="main-content">
             <header class="app-header">
                 <div class="header-left">
@@ -552,22 +542,62 @@
     </div>
 
     <script>
-        // ===== CONFIG =====
+        // ===== CONFIGURACIÓN GOOGLE SHEETS =====
+        const SHEET_ID = '1ISly1GKF3H24h089PFbu-oJ7Tuvs6Pt8_gkLD_yeeAs';
+        const SHEET_NAME = 'BD';
+        const SHEET_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=${SHEET_NAME}`;
+
+        // ===== USERS =====
         const USERS = {
             calidad: { password: 'dejahair', role: 'calidad', name: 'Auditor de Calidad' },
             operaciones: { password: 'Operaciones2026', role: 'operaciones', name: 'Gerente Operaciones' }
         };
 
-        // Mock para Ranking (luego se reemplaza por Google Sheets)
-        const rankingMock = [
-            { Ejecutivo: 'Maria Gomez', Equipo: 'Servicio', Auditorias: 8, Promedio: 92 },
-            { Ejecutivo: 'Juan Perez', Equipo: 'Ventas', Auditorias: 7, Promedio: 88 },
-            { Ejecutivo: 'Ana Ruiz', Equipo: 'Cobranza', Auditorias: 6, Promedio: 86 },
-            { Ejecutivo: 'Luis Torres', Equipo: 'Ventas', Auditorias: 5, Promedio: 82 },
-            { Ejecutivo: 'Carlos Diaz', Equipo: 'Servicio', Auditorias: 4, Promedio: 79 }
-        ];
-
         let currentUser = null;
+        let sheetData = [];
+
+        // ===== FETCH DATA FROM GOOGLE SHEETS =====
+        async function fetchSheetData() {
+            try {
+                const response = await fetch(SHEET_URL);
+                const text = await response.text();
+                const json = JSON.parse(text.substring(47).slice(0, -2));
+                
+                const rows = json.table.rows;
+                const data = rows.map(row => {
+                    const cells = row.c;
+                    return {
+                        ejecutivo: cells[0]?.v || '',
+                        supervisor: cells[1]?.v || '',
+                        campana: cells[2]?.v || '',
+                        semana: cells[3]?.v || '',
+                        fechaHora: cells[4]?.v || '',
+                        telefono: cells[5]?.v || '',
+                        tipoLlamada: cells[6]?.v || '',
+                        sondeo: cells[7]?.v || '',
+                        rebate: cells[8]?.v || '',
+                        generaNecesidad: cells[9]?.v || '',
+                        cierreVenta: cells[10]?.v || '',
+                        usaBaja: cells[11]?.v || '',
+                        habilidadComercial: cells[12]?.v || '',
+                        motivoNoVenta: cells[13]?.v || '',
+                        responsabilidad: cells[14]?.v || '',
+                        observacionesPositivas: cells[15]?.v || '',
+                        observacionesMejora: cells[16]?.v || '',
+                        recomendaciones: cells[17]?.v || '',
+                        fechaEvaluacion: cells[18]?.v || '',
+                        feedback: cells[19]?.v || '',
+                        audio: cells[20]?.v || ''
+                    };
+                });
+
+                sheetData = data;
+                return data;
+            } catch (error) {
+                console.error('Error al cargar datos:', error);
+                return [];
+            }
+        }
 
         // ===== LOGIN =====
         function handleLogin(event) {
@@ -590,12 +620,15 @@
         }
 
         // ===== SHOW APP =====
-        function showApp() {
+        async function showApp() {
             document.getElementById('loginSection').classList.add('hidden');
             document.getElementById('appContainer').classList.remove('hidden');
             document.getElementById('userRole').textContent = currentUser.name;
             setupMenuByRole();
             startDateTime();
+
+            // Cargar datos del Sheet
+            await fetchSheetData();
 
             if (currentUser.role === 'operaciones') {
                 navigateTo('dashboard');
@@ -607,7 +640,6 @@
         // ===== SETUP MENU BY ROLE =====
         function setupMenuByRole() {
             const role = currentUser.role;
-
             const btnDashboard = document.getElementById('btnDashboard');
             const btnRanking = document.getElementById('btnRanking');
             const btnGestionCalidad = document.getElementById('btnGestionCalidad');
@@ -624,7 +656,7 @@
         }
 
         // ===== NAVIGATE =====
-        function navigateTo(section) {
+        async function navigateTo(section) {
             document.querySelectorAll('.menu-btn').forEach(btn => btn.classList.remove('active'));
             const btn = document.querySelector(`[data-section="${section}"]`);
             if (btn) btn.classList.add('active');
@@ -639,63 +671,119 @@
             const pageContent = document.getElementById('pageContent');
 
             if (section === 'dashboard') {
+                pageContent.innerHTML = '<div class="loading">Cargando datos...</div>';
+                if (sheetData.length === 0) await fetchSheetData();
                 pageContent.innerHTML = getDashboardContent();
                 setTimeout(() => { createDashboardCharts(); }, 100);
             } else if (section === 'ranking') {
+                pageContent.innerHTML = '<div class="loading">Cargando ranking...</div>';
+                if (sheetData.length === 0) await fetchSheetData();
                 pageContent.innerHTML = getRankingContent();
                 setTimeout(() => { createRankingChart(); }, 100);
             } else if (section === 'gestion_calidad') {
+                pageContent.innerHTML = '<div class="loading">Cargando datos...</div>';
+                if (sheetData.length === 0) await fetchSheetData();
                 pageContent.innerHTML = getGestionCalidadContent();
             }
         }
 
-        // ===== CONTENT: DASHBOARD (solo operaciones) =====
+        // ===== CALCULAR MÉTRICAS DESDE SHEET =====
+        function calcularMetricas() {
+            const total = sheetData.length;
+            const habilidadSI = sheetData.filter(d => d.habilidadComercial === 'SI').length;
+            const promedioHabilidad = total > 0 ? Math.round((habilidadSI / total) * 100) : 0;
+            
+            const ejecutivosUnicos = [...new Set(sheetData.map(d => d.ejecutivo))].length;
+
+            return {
+                totalAuditorias: total,
+                promedioHabilidad: promedioHabilidad,
+                ejecutivosEvaluados: ejecutivosUnicos,
+                tasaConformidad: promedioHabilidad
+            };
+        }
+
+        // ===== DASHBOARD CONTENT =====
         function getDashboardContent() {
+            const metrics = calcularMetricas();
+
             return `
                 <div class="metrics-grid">
                     <div class="metric-card">
-                        <div class="metric-label">Calidad Promedio Global</div>
-                        <div class="metric-value">86%</div>
-                        <div class="metric-trend">↑ 1.8% vs mes anterior</div>
+                        <div class="metric-label">Habilidad Comercial Promedio</div>
+                        <div class="metric-value">${metrics.promedioHabilidad}%</div>
+                        <div class="metric-trend">Datos desde Google Sheets</div>
                     </div>
                     <div class="metric-card">
-                        <div class="metric-label">Auditorías Mes</div>
-                        <div class="metric-value">24</div>
-                        <div class="metric-trend">+5 auditorías</div>
+                        <div class="metric-label">Total Auditorías</div>
+                        <div class="metric-value">${metrics.totalAuditorias}</div>
+                        <div class="metric-trend">${sheetData.length} registros</div>
                     </div>
                     <div class="metric-card">
                         <div class="metric-label">Ejecutivos Evaluados</div>
-                        <div class="metric-value">5</div>
-                        <div class="metric-trend">100% del equipo</div>
+                        <div class="metric-value">${metrics.ejecutivosEvaluados}</div>
+                        <div class="metric-trend">Únicos</div>
                     </div>
                     <div class="metric-card">
                         <div class="metric-label">Tasa de Conformidad</div>
-                        <div class="metric-value">92%</div>
-                        <div class="metric-trend">Meta: 85% ✓</div>
+                        <div class="metric-value">${metrics.tasaConformidad}%</div>
+                        <div class="metric-trend">Meta: 85%</div>
                     </div>
                 </div>
 
                 <div class="charts-grid">
                     <div class="chart-container">
-                        <h3>Distribución de Habilidad Comercial</h3>
+                        <h3>Habilidad Comercial</h3>
                         <canvas id="chartHabilidad"></canvas>
                     </div>
                     <div class="chart-container">
                         <h3>Tipo de Llamada</h3>
-                        <canvas id="chartTipoLlamada"></canvas>
+                        <canvas id="chartTipo"></canvas>
                     </div>
                 </div>
             `;
         }
 
-        // ===== CONTENT: RANKING (operaciones, fuente futura: Sheets) =====
+        // ===== RANKING CONTENT =====
         function getRankingContent() {
-            const rows = rankingMock.map((r, i) => `
+            // Agrupar por ejecutivo y calcular promedio
+            const ejecutivosMap = {};
+            
+            sheetData.forEach(row => {
+                const ej = row.ejecutivo;
+                if (!ej) return;
+                
+                if (!ejecutivosMap[ej]) {
+                    ejecutivosMap[ej] = {
+                        ejecutivo: ej,
+                        supervisor: row.supervisor,
+                        campana: row.campana,
+                        auditorias: 0,
+                        habilidadSI: 0
+                    };
+                }
+                
+                ejecutivosMap[ej].auditorias++;
+                if (row.habilidadComercial === 'SI') {
+                    ejecutivosMap[ej].habilidadSI++;
+                }
+            });
+
+            // Convertir a array y calcular promedio
+            const ranking = Object.values(ejecutivosMap).map(ej => {
+                return {
+                    ...ej,
+                    promedio: ej.auditorias > 0 ? Math.round((ej.habilidadSI / ej.auditorias) * 100) : 0
+                };
+            }).sort((a, b) => b.promedio - a.promedio);
+
+            const rows = ranking.map((r, i) => `
                 <tr>
-                    <td><strong>${r.Ejecutivo}</strong></td>
-                    <td>${r.Equipo}</td>
-                    <td>${r.Auditorias}</td>
-                    <td>${r.Promedio}%</td>
+                    <td><strong>${r.ejecutivo}</strong></td>
+                    <td>${r.supervisor || '-'}</td>
+                    <td>${r.campana || '-'}</td>
+                    <td>${r.auditorias}</td>
+                    <td><strong>${r.promedio}%</strong></td>
                     <td>${i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : (i + 1) + '°'}</td>
                 </tr>
             `).join('');
@@ -703,13 +791,13 @@
             return `
                 <div class="section-header">
                     <h2>Ranking de Ejecutivos</h2>
-                    <button class="btn btn-primary" onclick="alert('Conexión a Google Sheets próximamente')">
-                        🔄 Actualizar desde Google Sheets
+                    <button class="btn btn-primary" onclick="actualizarDatos()">
+                        🔄 Actualizar Datos
                     </button>
                 </div>
                 <div class="charts-grid" style="margin-bottom:25px;">
                     <div class="chart-container">
-                        <h3>Promedio por Ejecutivo</h3>
+                        <h3>Top 10 Ejecutivos</h3>
                         <canvas id="chartRanking"></canvas>
                     </div>
                 </div>
@@ -718,136 +806,157 @@
                         <thead>
                             <tr>
                                 <th>Ejecutivo</th>
-                                <th>Equipo</th>
+                                <th>Supervisor</th>
+                                <th>Campaña</th>
                                 <th>Auditorías</th>
                                 <th>Promedio</th>
                                 <th>Posición</th>
                             </tr>
                         </thead>
                         <tbody>
-                            ${rows}
+                            ${rows || '<tr><td colspan="6">No hay datos disponibles</td></tr>'}
                         </tbody>
                     </table>
                 </div>
             `;
         }
 
-        // ===== CONTENT: GESTIÓN CALIDAD (solo calidad) =====
+        // ===== GESTIÓN CALIDAD CONTENT =====
         function getGestionCalidadContent() {
+            const rows = sheetData.slice(0, 20).map(row => `
+                <tr>
+                    <td>${row.ejecutivo}</td>
+                    <td>${row.fechaEvaluacion || row.fechaHora}</td>
+                    <td>${row.tipoLlamada}</td>
+                    <td><span class="badge ${row.habilidadComercial === 'SI' ? 'badge-success' : 'badge-pending'}">${row.habilidadComercial}</span></td>
+                    <td>${row.supervisor}</td>
+                </tr>
+            `).join('');
+
             return `
                 <div class="section-header">
-                    <h2>Gestión de Calidad</h2>
-                    <button class="btn btn-primary" onclick="alert('Formulario conectado a Google Sheets próximamente')">
+                    <h2>Gestión de Auditorías</h2>
+                    <button class="btn btn-primary" onclick="alert('Formulario próximamente')">
                         + Nueva Auditoría
                     </button>
                 </div>
                 <div class="table-container">
                     <p style="font-size:14px; color:#555; margin-bottom:15px;">
-                        Aquí podrás registrar y gestionar tus auditorías de calidad. 
-                        Esta vista estará conectada a Google Sheets para almacenar las evaluaciones.
+                        <strong>Total de registros:</strong> ${sheetData.length} | 
+                        Conectado a Google Sheets
                     </p>
                     <table>
                         <thead>
                             <tr>
-                                <th>ID Llamada</th>
                                 <th>Ejecutivo</th>
                                 <th>Fecha</th>
-                                <th>Calificación</th>
-                                <th>Estado</th>
+                                <th>Tipo Llamada</th>
+                                <th>Habilidad Comercial</th>
+                                <th>Supervisor</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
-                                <td>LL-202601-001</td>
-                                <td>Juan Perez</td>
-                                <td>14/01/2026</td>
-                                <td>85%</td>
-                                <td><span class="badge badge-success">Completo</span></td>
-                            </tr>
-                            <tr>
-                                <td>LL-202601-002</td>
-                                <td>Maria Gomez</td>
-                                <td>13/01/2026</td>
-                                <td>92%</td>
-                                <td><span class="badge badge-success">Completo</span></td>
-                            </tr>
-                            <tr>
-                                <td>LL-202601-003</td>
-                                <td>Luis Torres</td>
-                                <td>12/01/2026</td>
-                                <td>78%</td>
-                                <td><span class="badge badge-pending">Pendiente</span></td>
-                            </tr>
+                            ${rows || '<tr><td colspan="5">No hay datos</td></tr>'}
                         </tbody>
                     </table>
                 </div>
             `;
         }
 
-        // ===== CHARTS: DASHBOARD =====
+        // ===== DASHBOARD CHARTS =====
         function createDashboardCharts() {
             const ctxH = document.getElementById('chartHabilidad');
-            const ctxT = document.getElementById('chartTipoLlamada');
+            const ctxT = document.getElementById('chartTipo');
             if (!ctxH || !ctxT) return;
+
+            const habilidadSI = sheetData.filter(d => d.habilidadComercial === 'SI').length;
+            const habilidadNO = sheetData.filter(d => d.habilidadComercial === 'NO').length;
 
             new Chart(ctxH, {
                 type: 'doughnut',
                 data: {
                     labels: ['SI', 'NO'],
                     datasets: [{
-                        data: [3, 2],
-                        backgroundColor: ['#27ae60', '#e74c3c'],
-                        borderColor: ['#fff', '#fff'],
-                        borderWidth: 2
+                        data: [habilidadSI, habilidadNO],
+                        backgroundColor: ['#27ae60', '#e74c3c']
                     }]
                 },
-                options: {
-                    plugins: { legend: { position: 'bottom' } },
-                    responsive: true
-                }
+                options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
+            });
+
+            const tipoMap = {};
+            sheetData.forEach(d => {
+                tipoMap[d.tipoLlamada] = (tipoMap[d.tipoLlamada] || 0) + 1;
             });
 
             new Chart(ctxT, {
                 type: 'bar',
                 data: {
-                    labels: ['Venta', 'No Venta'],
+                    labels: Object.keys(tipoMap),
                     datasets: [{
                         label: 'Cantidad',
-                        data: [3, 2],
+                        data: Object.values(tipoMap),
                         backgroundColor: '#2a5298',
                         borderRadius: 8
                     }]
                 },
-                options: {
-                    plugins: { legend: { display: false } },
-                    responsive: true,
-                    scales: { y: { beginAtZero: true } }
-                }
+                options: { responsive: true, plugins: { legend: { display: false } } }
             });
         }
 
-        // ===== CHARTS: RANKING =====
+        // ===== RANKING CHART =====
         function createRankingChart() {
             const ctx = document.getElementById('chartRanking');
             if (!ctx) return;
 
+            // Calcular ranking
+            const ejecutivosMap = {};
+            sheetData.forEach(row => {
+                const ej = row.ejecutivo;
+                if (!ej) return;
+                if (!ejecutivosMap[ej]) {
+                    ejecutivosMap[ej] = { auditorias: 0, habilidadSI: 0 };
+                }
+                ejecutivosMap[ej].auditorias++;
+                if (row.habilidadComercial === 'SI') ejecutivosMap[ej].habilidadSI++;
+            });
+
+            const ranking = Object.keys(ejecutivosMap).map(ej => ({
+                ejecutivo: ej,
+                promedio: Math.round((ejecutivosMap[ej].habilidadSI / ejecutivosMap[ej].auditorias) * 100)
+            })).sort((a, b) => b.promedio - a.promedio).slice(0, 10);
+
             new Chart(ctx, {
                 type: 'bar',
                 data: {
-                    labels: rankingMock.map(r => r.Ejecutivo),
+                    labels: ranking.map(r => r.ejecutivo),
                     datasets: [{
                         label: 'Promedio %',
-                        data: rankingMock.map(r => r.Promedio),
+                        data: ranking.map(r => r.promedio),
                         backgroundColor: '#4ecdc4',
                         borderRadius: 8
                     }]
                 },
                 options: {
+                    indexAxis: 'y',
                     responsive: true,
                     plugins: { legend: { display: false } },
-                    scales: { y: { beginAtZero: true, max: 100 } }
+                    scales: { x: { beginAtZero: true, max: 100 } }
                 }
             });
+        }
+
+        // ===== ACTUALIZAR DATOS =====
+        async function actualizarDatos() {
+            const btn = event.target;
+            btn.textContent = '⏳ Actualizando...';
+            btn.disabled = true;
+            
+            await fetchSheetData();
+            await navigateTo('ranking');
+            
+            btn.textContent = '🔄 Actualizar Datos';
+            btn.disabled = false;
         }
 
         // ===== LOGOUT =====
@@ -855,6 +964,7 @@
             if (confirm('¿Cerrar sesión?')) {
                 sessionStorage.removeItem('currentUser');
                 currentUser = null;
+                sheetData = [];
                 document.getElementById('loginSection').classList.remove('hidden');
                 document.getElementById('appContainer').classList.add('hidden');
                 document.getElementById('loginForm').reset();

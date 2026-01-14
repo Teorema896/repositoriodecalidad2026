@@ -1,8 +1,8 @@
 // ========== main.js ==========
 // VARIABLES GLOBALES
-let allData = [];
-let filteredData = [];
-let chartInstances = [];
+window.allData = [];
+window.filteredData = [];
+window.chartInstances = [];
 
 // CONSTANTES
 const GOOGLE_SHEETS_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTR4TBW_qQtsV-yHeyv_EJhixz5qW1AFxXyWLZYxEa95MrUWiqrLrpJuVdFAPmtFKUnvtQ1mO0muhNq/pub?gid=0&single=true&output=csv';
@@ -112,3 +112,4 @@ document.addEventListener('DOMContentLoaded', function() {
         console.warn('⚠️ login.js no cargado aún');
     }
 });
+

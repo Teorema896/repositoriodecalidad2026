@@ -258,42 +258,69 @@
                     </div>
                 </div>
 
-                <!-- ===== RANKING DE EJECUTIVOS ===== -->
+               <!-- ===== RANKING DE EJECUTIVOS ===== -->
 <div id="ranking" class="tab-content">
-    <!-- Contenido generado dinámicamente por ranking.js -->
-    <div class="ranking-placeholder">
-        <div class="placeholder-content">
-            <div class="placeholder-icon">🏆</div>
-            <h2 class="placeholder-title">Ranking de Ejecutivos</h2>
-            <p class="placeholder-text">
-                Sistema de evaluación y ranking basado en desempeño comercial y habilidades.
-            </p>
-            <div class="placeholder-stats">
-                <div class="stat-card">
+    <div class="ranking-container">
+        <!-- Header del Ranking -->
+        <div class="ranking-header">
+            <div class="ranking-title-section">
+                <h1 class="ranking-main-title">
+                    <span class="ranking-icon-main">🏆</span>
+                    Ranking de Ejecutivos
+                </h1>
+                <p class="ranking-subtitle">
+                    Evaluación integral basada en ventas y habilidades comerciales
+                </p>
+            </div>
+            
+            <div class="ranking-stats-bar">
+                <div class="stat-box">
+                    <div class="stat-icon">👥</div>
+                    <div class="stat-content">
+                        <div class="stat-value" id="totalEjecutivos">0</div>
+                        <div class="stat-label">Ejecutivos</div>
+                    </div>
+                </div>
+                <div class="stat-box">
                     <div class="stat-icon">📊</div>
-                    <div class="stat-info">
-                        <div class="stat-value" id="rankingTotalEjecutivos">--</div>
-                        <div class="stat-label">Ejecutivos evaluados</div>
+                    <div class="stat-content">
+                        <div class="stat-value" id="promedioGeneral">0%</div>
+                        <div class="stat-label">Promedio</div>
                     </div>
                 </div>
-                <div class="stat-card">
+                <div class="stat-box">
                     <div class="stat-icon">⭐</div>
-                    <div class="stat-info">
-                        <div class="stat-value" id="rankingPromedio">--%</div>
-                        <div class="stat-label">Puntuación promedio</div>
+                    <div class="stat-content">
+                        <div class="stat-value" id="mejorPuntuacion">0%</div>
+                        <div class="stat-label">Top 1</div>
                     </div>
                 </div>
-                <div class="stat-card">
-                    <div class="stat-icon">🔄</div>
-                    <div class="stat-info">
-                        <div class="stat-value" id="rankingActualizado">--:--</div>
-                        <div class="stat-label">Última actualización</div>
+                <div class="stat-box">
+                    <div class="stat-icon">🕒</div>
+                    <div class="stat-content">
+                        <div class="stat-value" id="ultimaActualizacion">--:--</div>
+                        <div class="stat-label">Actualizado</div>
                     </div>
                 </div>
             </div>
-            <button class="btn btn-primary" onclick="renderRanking()" id="btnGenerarRanking">
-                🏆 Generar Ranking
-            </button>
+        </div>
+
+        <!-- Loading State -->
+        <div id="rankingLoading" class="ranking-loading">
+            <div class="loading-spinner"></div>
+            <p>Calculando ranking...</p>
+        </div>
+
+        <!-- Contenido del Ranking (se llena dinámicamente) -->
+        <div id="rankingContent" class="ranking-content" style="display: none;">
+            <!-- Aquí se insertará el ranking generado por JavaScript -->
+        </div>
+
+        <!-- Estado sin datos -->
+        <div id="rankingNoData" class="ranking-no-data" style="display: none;">
+            <div class="no-data-icon">📊</div>
+            <h3>No hay datos disponibles</h3>
+            <p>Ve al Dashboard para cargar auditorías primero.</p>
         </div>
     </div>
 </div>

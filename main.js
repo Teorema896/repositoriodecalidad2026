@@ -8,6 +8,7 @@ window.chartInstances = [];
 window.GOOGLE_SHEETS_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTR4TBW_qQtsV-yHeyv_EJhixz5qW1AFxXyWLZYxEa95MrUWiqrLrpJuVdFAPmtFKUnvtQ1mO0muhNq/pub?gid=0&single=true&output=csv';
 
 // FUNCIONES GLOBALES
+// En la función switchTab, asegúrate que tenga esto:
 window.switchTab = function(tabName) {
     console.log('Cambiando a:', tabName);
     
@@ -36,80 +37,34 @@ window.switchTab = function(tabName) {
         setTimeout(initFeedback, 100);
     }
     
-    if (tabName === 'analisis' && typeof renderRanking === 'function') {
-        setTimeout(renderRanking, 100);
+    if (tabName === 'ranking') {
+        // Cargar ranking automáticamente
+        setTimeout(() => {
+            if (typeof renderRanking === 'function') {
+                renderRanking();
+            } else {
+                console.warn('⚠️ renderRanking no está definido');
+                // Mostrar estado de error
+                const content = document.getElementById('rankingContent');
+                const noData = document.getElementById('rankingNoData');
+                const loading = document.getElementById('rankingLoading');
+                
+                if (loading) loading.style.display = 'none';
+                if (content) content.style.display = 'none';
+                if (noData) {
+                    noData.style.display = 'block';
+                    noData.innerHTML = `
+                        <div class="no-data-icon">⚠️</div>
+                        <h3>Error cargando ranking</h3>
+                        <p>La función renderRanking no está disponible.</p>
+                        <button class="btn btn-primary" onclick="location.reload()">
+                            Recargar página
+                        </button>
+                    `;
+                }
+            }
+        }, 100);
     }
 };
 
-window.closeModal = function() {
-    const modal = document.getElementById('detailModal');
-    if (modal) modal.style.display = 'none';
-};
-
-window.showMessage = function(text, type) {
-    const container = document.getElementById('messageContainer');
-    if (!container) return;
-    
-    container.innerHTML = `<div class="message message-${type}">${text}</div>`;
-    setTimeout(() => { container.innerHTML = ''; }, 4000);
-};
-
-// Función placeholder hasta que se cargue dashboard.js
-window.loadDataFromGoogleSheets = function() {
-    console.log('⚠️ dashboard.js no cargado aún');
-    const loading = document.getElementById('loadingMessage');
-    if (loading) {
-        loading.innerHTML = '🔄 Cargando módulo de datos...';
-    }
-};
-
-window.mostrarRanking = function() {
-    alert('Función de ranking - En desarrollo');
-};
-
-window.clearFilters = function() {
-    alert('Función clearFilters - En desarrollo');
-};
-
-window.exportToCSV = function() {
-    alert('Función exportToCSV - En desarrollo');
-};
-
-// Reloj
-function actualizarFechaHora() {
-    const ahora = new Date();
-    const opciones = { 
-        weekday: 'long', 
-        year: 'numeric', 
-        month: 'long', 
-        day: 'numeric' 
-    };
-    
-    let fechaFormateada = ahora.toLocaleDateString('es-PE', opciones);
-    fechaFormateada = fechaFormateada.charAt(0).toUpperCase() + fechaFormateada.slice(1);
-
-    const horas = ahora.getHours().toString().padStart(2, '0');
-    const minutos = ahora.getMinutes().toString().padStart(2, '0');
-    const segundos = ahora.getSeconds().toString().padStart(2, '0');
-
-    const fechaEl = document.getElementById('fechaActual');
-    const horaEl = document.getElementById('horaActual');
-    
-    if (fechaEl) fechaEl.textContent = fechaFormateada;
-    if (horaEl) horaEl.textContent = `${horas}:${minutos}:${segundos}`;
-}
-
-// Inicialización
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('🚀 Main.js inicializado');
-    
-    // Iniciar reloj
-    actualizarFechaHora();
-    setInterval(actualizarFechaHora, 1000);
-    
-    // Asegurar que funciones existan
-    if (typeof handleLogin === 'undefined') {
-        console.warn('⚠️ login.js no cargado aún');
-    }
-});
 

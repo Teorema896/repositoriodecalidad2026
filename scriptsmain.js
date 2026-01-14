@@ -1,46 +1,39 @@
-// Datos ficticios de usuarios
-const users = [
-    { username: 'calidad', password: 'dejahair', role: 'calidad' },
-    { username: 'operaciones', password: 'Operaciones 2026', role: 'operaciones' }
-];
+document.addEventListener('DOMContentLoaded', () => {
+    const loginSection = document.getElementById('login-section');
+    const dashboardSection = document.getElementById('dashboard-section');
+    const loginBtn = document.getElementById('loginBtn');
+    const loginError = document.getElementById('login-error');
 
-// Función de login simple
-function login(username, password) {
-    const user = users.find(u => u.username === username && u.password === password);
-    if (user) {
-        sessionStorage.setItem('role', user.role);
-        applyRole(user.role);
-        alert(`Bienvenido ${username}`);
-        return true;
-    } else {
-        alert('Usuario o contraseña incorrectos');
-        return false;
-    }
-}
+    const menuBtns = document.querySelectorAll('.menu-btn');
 
-// Mostrar botones según rol
-function applyRole(role) {
-    const items = document.querySelectorAll('#menu li');
-    items.forEach(item => {
-        if (item.dataset.role !== role) {
-            item.classList.add('hidden');
+    const usuarios = {
+        calidad: 'dejahair',
+        operaciones: 'Operaciones 2026'
+    };
+
+    loginBtn.addEventListener('click', () => {
+        const username = document.getElementById('username').value.trim();
+        const password = document.getElementById('password').value.trim();
+
+        if (usuarios[username] && usuarios[username] === password) {
+            // Login correcto
+            loginSection.style.display = 'none';
+            dashboardSection.style.display = 'block';
+
+            // Mostrar solo botones del rol correspondiente
+            menuBtns.forEach(btn => {
+                if (btn.dataset.role !== username) btn.style.display = 'none';
+                else btn.style.display = 'block';
+            });
         } else {
-            item.classList.remove('hidden');
+            loginError.textContent = 'Usuario o contraseña incorrectos';
         }
     });
-}
 
-// Demo: escucha click en menú
-document.addEventListener('DOMContentLoaded', () => {
-    // Pedimos login al abrir (solo para test)
-    const username = prompt('Usuario:');
-    const password = prompt('Contraseña:');
-    if (!login(username, password)) return;
-
-    const menuItems = document.querySelectorAll('#menu li');
-    menuItems.forEach(item => {
-        item.addEventListener('click', () => {
-            document.getElementById('demo-content').textContent = `Has seleccionado: ${item.textContent}`;
+    // Función para manejar clicks del menú
+    menuBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            dashboardSection.innerHTML = `<h3>${btn.textContent}</h3><p>Sección de ${btn.textContent} en desarrollo...</p>`;
         });
     });
 });

@@ -406,26 +406,6 @@
             overflow-x: auto;
         }
 
-        .search-bar {
-            margin-bottom: 20px;
-        }
-
-        .search-input {
-            padding: 11px 15px;
-            border: 2px solid #e0e6ed;
-            border-radius: 8px;
-            width: 100%;
-            max-width: 350px;
-            font-size: 14px;
-            transition: all 0.3s;
-        }
-
-        .search-input:focus {
-            outline: none;
-            border-color: #2a5298;
-            box-shadow: 0 0 0 4px rgba(42, 82, 152, 0.1);
-        }
-
         table {
             width: 100%;
             border-collapse: collapse;
@@ -464,48 +444,9 @@
             color: #27ae60;
         }
 
-        .badge-error {
-            background: #fadbd8;
-            color: #e74c3c;
-        }
-
         .badge-pending {
             background: #fef5e7;
             color: #f39c12;
-        }
-
-        /* ========== REPORTES GRID ========== */
-        .reportes-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-            gap: 20px;
-        }
-
-        .reporte-card {
-            background: white;
-            padding: 25px;
-            border-radius: 12px;
-            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
-            text-align: center;
-            transition: all 0.3s;
-        }
-
-        .reporte-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
-        }
-
-        .reporte-card h3 {
-            font-size: 16px;
-            color: #2c3e50;
-            margin-bottom: 10px;
-            font-weight: 700;
-        }
-
-        .reporte-card p {
-            font-size: 13px;
-            color: #7f8c8d;
-            margin-bottom: 15px;
         }
 
         /* ========== RESPONSIVE ========== */
@@ -526,7 +467,7 @@
                 overflow-x: auto;
             }
 
-            .metrics-grid, .charts-grid, .reportes-grid {
+            .metrics-grid, .charts-grid {
                 grid-template-columns: 1fr;
             }
         }
@@ -576,17 +517,15 @@
             </div>
 
             <nav class="sidebar-menu">
-                <button class="menu-btn active" data-section="dashboard" onclick="navigateTo('dashboard')">
+                <!-- Botones, se mostrarán/ocultarán por rol -->
+                <button class="menu-btn active" id="btnDashboard" data-section="dashboard" onclick="navigateTo('dashboard')">
                     📊 Dashboard
                 </button>
-                <button class="menu-btn" id="btnAuditorias" data-section="auditorias" onclick="navigateTo('auditorias')">
-                    ✓ Auditorías
+                <button class="menu-btn" id="btnRanking" data-section="ranking" onclick="navigateTo('ranking')">
+                    🏅 Ranking
                 </button>
-                <button class="menu-btn" id="btnEjecutivos" data-section="ejecutivos" onclick="navigateTo('ejecutivos')">
-                    👥 Ejecutivos
-                </button>
-                <button class="menu-btn" id="btnReportes" data-section="reportes" onclick="navigateTo('reportes')">
-                    📄 Reportes
+                <button class="menu-btn" id="btnGestionCalidad" data-section="gestion_calidad" onclick="navigateTo('gestion_calidad')">
+                    ✓ Gestión Calidad
                 </button>
             </nav>
 
@@ -619,12 +558,13 @@
             operaciones: { password: 'Operaciones2026', role: 'operaciones', name: 'Gerente Operaciones' }
         };
 
-        const sampleData = [
-            { Ejecutivo: 'Juan Perez', 'Habilidad Comercial': 'SI', 'Tipo de Llamada': 'Venta' },
-            { Ejecutivo: 'Maria Gomez', 'Habilidad Comercial': 'NO', 'Tipo de Llamada': 'No Venta' },
-            { Ejecutivo: 'Luis Torres', 'Habilidad Comercial': 'SI', 'Tipo de Llamada': 'Venta' },
-            { Ejecutivo: 'Ana Ruiz', 'Habilidad Comercial': 'SI', 'Tipo de Llamada': 'No Venta' },
-            { Ejecutivo: 'Carlos Diaz', 'Habilidad Comercial': 'NO', 'Tipo de Llamada': 'Venta' },
+        // Mock para Ranking (luego se reemplaza por Google Sheets)
+        const rankingMock = [
+            { Ejecutivo: 'Maria Gomez', Equipo: 'Servicio', Auditorias: 8, Promedio: 92 },
+            { Ejecutivo: 'Juan Perez', Equipo: 'Ventas', Auditorias: 7, Promedio: 88 },
+            { Ejecutivo: 'Ana Ruiz', Equipo: 'Cobranza', Auditorias: 6, Promedio: 86 },
+            { Ejecutivo: 'Luis Torres', Equipo: 'Ventas', Auditorias: 5, Promedio: 82 },
+            { Ejecutivo: 'Carlos Diaz', Equipo: 'Servicio', Auditorias: 4, Promedio: 79 }
         ];
 
         let currentUser = null;
@@ -656,33 +596,43 @@
             document.getElementById('userRole').textContent = currentUser.name;
             setupMenuByRole();
             startDateTime();
-            navigateTo('dashboard');
+
+            if (currentUser.role === 'operaciones') {
+                navigateTo('dashboard');
+            } else {
+                navigateTo('gestion_calidad');
+            }
         }
 
-        // ===== SETUP MENU =====
+        // ===== SETUP MENU BY ROLE =====
         function setupMenuByRole() {
             const role = currentUser.role;
+
+            const btnDashboard = document.getElementById('btnDashboard');
+            const btnRanking = document.getElementById('btnRanking');
+            const btnGestionCalidad = document.getElementById('btnGestionCalidad');
+
             if (role === 'calidad') {
-                document.getElementById('btnAuditorias').style.display = 'block';
-                document.getElementById('btnEjecutivos').style.display = 'block';
-                document.getElementById('btnReportes').style.display = 'block';
+                btnDashboard.style.display = 'none';
+                btnRanking.style.display = 'none';
+                btnGestionCalidad.style.display = 'block';
             } else if (role === 'operaciones') {
-                document.getElementById('btnAuditorias').style.display = 'block';
-                document.getElementById('btnReportes').style.display = 'block';
-                document.getElementById('btnEjecutivos').style.display = 'none';
+                btnDashboard.style.display = 'block';
+                btnRanking.style.display = 'block';
+                btnGestionCalidad.style.display = 'none';
             }
         }
 
         // ===== NAVIGATE =====
         function navigateTo(section) {
             document.querySelectorAll('.menu-btn').forEach(btn => btn.classList.remove('active'));
-            document.querySelector(`[data-section="${section}"]`).classList.add('active');
+            const btn = document.querySelector(`[data-section="${section}"]`);
+            if (btn) btn.classList.add('active');
 
             const titles = {
                 dashboard: '📊 Dashboard',
-                auditorias: '✓ Auditorías',
-                ejecutivos: '👥 Ejecutivos',
-                reportes: '📄 Reportes'
+                ranking: '🏅 Ranking',
+                gestion_calidad: '✓ Gestión Calidad'
             };
             document.getElementById('pageTitle').textContent = titles[section];
 
@@ -690,26 +640,23 @@
 
             if (section === 'dashboard') {
                 pageContent.innerHTML = getDashboardContent();
-                setTimeout(() => {
-                    createCharts();
-                }, 100);
-            } else if (section === 'auditorias') {
-                pageContent.innerHTML = getAuditoriasContent();
-            } else if (section === 'ejecutivos') {
-                pageContent.innerHTML = getEjecutivosContent();
-            } else if (section === 'reportes') {
-                pageContent.innerHTML = getReportesContent();
+                setTimeout(() => { createDashboardCharts(); }, 100);
+            } else if (section === 'ranking') {
+                pageContent.innerHTML = getRankingContent();
+                setTimeout(() => { createRankingChart(); }, 100);
+            } else if (section === 'gestion_calidad') {
+                pageContent.innerHTML = getGestionCalidadContent();
             }
         }
 
-        // ===== CONTENT FUNCTIONS =====
+        // ===== CONTENT: DASHBOARD (solo operaciones) =====
         function getDashboardContent() {
             return `
                 <div class="metrics-grid">
                     <div class="metric-card">
-                        <div class="metric-label">Calidad Promedio</div>
-                        <div class="metric-value">85%</div>
-                        <div class="metric-trend">↑ 2.5% vs mes anterior</div>
+                        <div class="metric-label">Calidad Promedio Global</div>
+                        <div class="metric-value">86%</div>
+                        <div class="metric-trend">↑ 1.8% vs mes anterior</div>
                     </div>
                     <div class="metric-card">
                         <div class="metric-label">Auditorías Mes</div>
@@ -730,74 +677,41 @@
 
                 <div class="charts-grid">
                     <div class="chart-container">
-                        <h3>Habilidad Comercial</h3>
-                        <canvas id="chart1"></canvas>
+                        <h3>Distribución de Habilidad Comercial</h3>
+                        <canvas id="chartHabilidad"></canvas>
                     </div>
                     <div class="chart-container">
                         <h3>Tipo de Llamada</h3>
-                        <canvas id="chart2"></canvas>
+                        <canvas id="chartTipoLlamada"></canvas>
                     </div>
                 </div>
             `;
         }
 
-        function getAuditoriasContent() {
-            return `
-                <div class="section-header">
-                    <h2>Gestión de Auditorías</h2>
-                    <button class="btn btn-primary" onclick="alert('Funcionalidad próximamente')">+ Nueva Auditoría</button>
-                </div>
-                <div class="search-bar">
-                    <input type="text" class="search-input" placeholder="Buscar auditoría...">
-                </div>
-                <div class="table-container">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Ejecutivo</th>
-                                <th>Fecha</th>
-                                <th>Calificación</th>
-                                <th>Estado</th>
-                                <th>Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>#001</td>
-                                <td>Juan Perez</td>
-                                <td>14/01/2026</td>
-                                <td><strong>85%</strong></td>
-                                <td><span class="badge badge-success">Completo</span></td>
-                                <td><a href="#" style="color: #2a5298; text-decoration: none;">Ver</a></td>
-                            </tr>
-                            <tr>
-                                <td>#002</td>
-                                <td>Maria Gomez</td>
-                                <td>13/01/2026</td>
-                                <td><strong>92%</strong></td>
-                                <td><span class="badge badge-success">Completo</span></td>
-                                <td><a href="#" style="color: #2a5298; text-decoration: none;">Ver</a></td>
-                            </tr>
-                            <tr>
-                                <td>#003</td>
-                                <td>Luis Torres</td>
-                                <td>12/01/2026</td>
-                                <td><strong>78%</strong></td>
-                                <td><span class="badge badge-pending">Pendiente</span></td>
-                                <td><a href="#" style="color: #2a5298; text-decoration: none;">Ver</a></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            `;
-        }
+        // ===== CONTENT: RANKING (operaciones, fuente futura: Sheets) =====
+        function getRankingContent() {
+            const rows = rankingMock.map((r, i) => `
+                <tr>
+                    <td><strong>${r.Ejecutivo}</strong></td>
+                    <td>${r.Equipo}</td>
+                    <td>${r.Auditorias}</td>
+                    <td>${r.Promedio}%</td>
+                    <td>${i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : (i + 1) + '°'}</td>
+                </tr>
+            `).join('');
 
-        function getEjecutivosContent() {
             return `
                 <div class="section-header">
                     <h2>Ranking de Ejecutivos</h2>
-                    <button class="btn btn-primary" onclick="alert('Funcionalidad próximamente')">+ Agregar Ejecutivo</button>
+                    <button class="btn btn-primary" onclick="alert('Conexión a Google Sheets próximamente')">
+                        🔄 Actualizar desde Google Sheets
+                    </button>
+                </div>
+                <div class="charts-grid" style="margin-bottom:25px;">
+                    <div class="chart-container">
+                        <h3>Promedio por Ejecutivo</h3>
+                        <canvas id="chartRanking"></canvas>
+                    </div>
                 </div>
                 <div class="table-container">
                     <table>
@@ -811,40 +725,58 @@
                             </tr>
                         </thead>
                         <tbody>
+                            ${rows}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        }
+
+        // ===== CONTENT: GESTIÓN CALIDAD (solo calidad) =====
+        function getGestionCalidadContent() {
+            return `
+                <div class="section-header">
+                    <h2>Gestión de Calidad</h2>
+                    <button class="btn btn-primary" onclick="alert('Formulario conectado a Google Sheets próximamente')">
+                        + Nueva Auditoría
+                    </button>
+                </div>
+                <div class="table-container">
+                    <p style="font-size:14px; color:#555; margin-bottom:15px;">
+                        Aquí podrás registrar y gestionar tus auditorías de calidad. 
+                        Esta vista estará conectada a Google Sheets para almacenar las evaluaciones.
+                    </p>
+                    <table>
+                        <thead>
                             <tr>
-                                <td><strong>Maria Gomez</strong></td>
-                                <td>Servicio</td>
-                                <td>8</td>
-                                <td>92%</td>
-                                <td>🥇 1°</td>
+                                <th>ID Llamada</th>
+                                <th>Ejecutivo</th>
+                                <th>Fecha</th>
+                                <th>Calificación</th>
+                                <th>Estado</th>
                             </tr>
+                        </thead>
+                        <tbody>
                             <tr>
-                                <td><strong>Juan Perez</strong></td>
-                                <td>Ventas</td>
-                                <td>7</td>
+                                <td>LL-202601-001</td>
+                                <td>Juan Perez</td>
+                                <td>14/01/2026</td>
                                 <td>85%</td>
-                                <td>🥈 2°</td>
+                                <td><span class="badge badge-success">Completo</span></td>
                             </tr>
                             <tr>
-                                <td><strong>Ana Ruiz</strong></td>
-                                <td>Cobranza</td>
-                                <td>6</td>
-                                <td>88%</td>
-                                <td>🥉 3°</td>
+                                <td>LL-202601-002</td>
+                                <td>Maria Gomez</td>
+                                <td>13/01/2026</td>
+                                <td>92%</td>
+                                <td><span class="badge badge-success">Completo</span></td>
                             </tr>
                             <tr>
-                                <td><strong>Luis Torres</strong></td>
-                                <td>Ventas</td>
-                                <td>5</td>
-                                <td>81%</td>
-                                <td>4°</td>
-                            </tr>
-                            <tr>
-                                <td><strong>Carlos Diaz</strong></td>
-                                <td>Servicio</td>
-                                <td>4</td>
-                                <td>79%</td>
-                                <td>5°</td>
+                                <td>LL-202601-003</td>
+                                <td>Luis Torres</td>
+                                <td>12/01/2026</td>
+                                <td>78%</td>
+                                <td><span class="badge badge-pending">Pendiente</span></td>
                             </tr>
                         </tbody>
                     </table>
@@ -852,45 +784,13 @@
             `;
         }
 
-        function getReportesContent() {
-            return `
-                <div class="section-header">
-                    <h2>Reportes y Análisis</h2>
-                    <button class="btn btn-primary" onclick="alert('Funcionalidad próximamente')">📥 Descargar</button>
-                </div>
-                <div class="reportes-grid">
-                    <div class="reporte-card">
-                        <h3>📈 Reporte Mensual</h3>
-                        <p>Análisis completo del mes actual con gráficos y estadísticas detalladas</p>
-                        <button class="btn btn-secondary" onclick="alert('Funcionalidad próximamente')">Generar</button>
-                    </div>
-                    <div class="reporte-card">
-                        <h3>👤 Por Ejecutivo</h3>
-                        <p>Desempeño individual con histórico de evaluaciones</p>
-                        <button class="btn btn-secondary" onclick="alert('Funcionalidad próximamente')">Generar</button>
-                    </div>
-                    <div class="reporte-card">
-                        <h3>📊 Por Criterio</h3>
-                        <p>Análisis de criterios de evaluación y debilidades</p>
-                        <button class="btn btn-secondary" onclick="alert('Funcionalidad próximamente')">Generar</button>
-                    </div>
-                    <div class="reporte-card">
-                        <h3>📉 Tendencias</h3>
-                        <p>Proyecciones y tendencias para los próximos periodos</p>
-                        <button class="btn btn-secondary" onclick="alert('Funcionalidad próximamente')">Generar</button>
-                    </div>
-                </div>
-            `;
-        }
+        // ===== CHARTS: DASHBOARD =====
+        function createDashboardCharts() {
+            const ctxH = document.getElementById('chartHabilidad');
+            const ctxT = document.getElementById('chartTipoLlamada');
+            if (!ctxH || !ctxT) return;
 
-        // ===== CHARTS =====
-        function createCharts() {
-            const ctx1 = document.getElementById('chart1');
-            const ctx2 = document.getElementById('chart2');
-
-            if (!ctx1 || !ctx2) return;
-
-            new Chart(ctx1, {
+            new Chart(ctxH, {
                 type: 'doughnut',
                 data: {
                     labels: ['SI', 'NO'],
@@ -902,14 +802,12 @@
                     }]
                 },
                 options: {
-                    responsive: true,
-                    plugins: {
-                        legend: { position: 'bottom' }
-                    }
+                    plugins: { legend: { position: 'bottom' } },
+                    responsive: true
                 }
             });
 
-            new Chart(ctx2, {
+            new Chart(ctxT, {
                 type: 'bar',
                 data: {
                     labels: ['Venta', 'No Venta'],
@@ -921,13 +819,33 @@
                     }]
                 },
                 options: {
+                    plugins: { legend: { display: false } },
                     responsive: true,
-                    plugins: {
-                        legend: { display: false }
-                    },
-                    scales: {
-                        y: { beginAtZero: true }
-                    }
+                    scales: { y: { beginAtZero: true } }
+                }
+            });
+        }
+
+        // ===== CHARTS: RANKING =====
+        function createRankingChart() {
+            const ctx = document.getElementById('chartRanking');
+            if (!ctx) return;
+
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: rankingMock.map(r => r.Ejecutivo),
+                    datasets: [{
+                        label: 'Promedio %',
+                        data: rankingMock.map(r => r.Promedio),
+                        backgroundColor: '#4ecdc4',
+                        borderRadius: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: { legend: { display: false } },
+                    scales: { y: { beginAtZero: true, max: 100 } }
                 }
             });
         }

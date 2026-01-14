@@ -36,8 +36,8 @@ window.switchTab = function(tabName) {
         setTimeout(initFeedback, 100);
     }
     
-    if (tabName === 'analisis' && typeof renderAnalysis === 'function') {
-        setTimeout(renderAnalysis, 100);
+    if (tabName === 'analisis' && typeof renderRanking === 'function') {
+        setTimeout(renderRanking, 100);
     }
 };
 
@@ -112,3 +112,4 @@ document.addEventListener('DOMContentLoaded', function() {
         console.warn('⚠️ login.js no cargado aún');
     }
 });
+

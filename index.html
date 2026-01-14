@@ -18,7 +18,6 @@
             color: #333;
         }
 
-        /* ========== LOGIN STYLES ========== */
         .login-container {
             display: flex;
             align-items: center;
@@ -183,7 +182,6 @@
             display: none !important;
         }
 
-        /* ========== SIDEBAR ========== */
         .sidebar {
             width: 260px;
             background: linear-gradient(180deg, #1e3c72 0%, #2a5298 100%);
@@ -344,9 +342,14 @@
             color: white;
         }
 
-        .btn-primary:hover {
+        .btn-primary:hover:not(:disabled) {
             transform: translateY(-2px);
             box-shadow: 0 8px 20px rgba(42, 82, 152, 0.25);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
         }
 
         .btn-secondary {
@@ -481,7 +484,6 @@
             font-size: 14px;
         }
 
-        /* ========== MODAL ========== */
         .modal {
             display: none;
             position: fixed;
@@ -629,7 +631,6 @@
 </head>
 <body>
 
-    <!-- ========== LOGIN ========== -->
     <div id="loginSection" class="login-container">
         <div class="login-box">
             <div class="login-header">
@@ -661,7 +662,6 @@
         </div>
     </div>
 
-    <!-- ========== APP ========== -->
     <div id="appContainer" class="app-container hidden">
         <aside class="sidebar">
             <div class="sidebar-header">
@@ -697,12 +697,10 @@
             </header>
 
             <section class="page-content" id="pageContent">
-                <!-- Content loaded dynamically -->
             </section>
         </main>
     </div>
 
-    <!-- ========== MODAL FORMULARIO ========== -->
     <div id="auditoriaModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
@@ -714,7 +712,6 @@
                 
                 <form id="auditoriaForm" onsubmit="guardarAuditoria(event)">
                     <div class="form-grid">
-                        <!-- Datos Básicos -->
                         <div class="form-group required">
                             <label for="ejecutivo">Ejecutivo</label>
                             <input type="text" id="ejecutivo" name="ejecutivo" required>
@@ -770,7 +767,6 @@
                             </select>
                         </div>
 
-                        <!-- Criterios de Evaluación -->
                         <div class="form-section">
                             <h3>Criterios de Evaluación</h3>
                         </div>
@@ -829,7 +825,6 @@
                             </div>
                         </div>
 
-                        <!-- Motivo No Venta -->
                         <div class="form-section">
                             <h3>En caso de No Venta</h3>
                         </div>
@@ -864,7 +859,6 @@
                             </select>
                         </div>
 
-                        <!-- Observaciones -->
                         <div class="form-section">
                             <h3>Observaciones y Recomendaciones</h3>
                         </div>
@@ -899,10 +893,9 @@
                             <input type="text" id="audio" name="audio" placeholder="https://...">
                         </div>
 
-                        <!-- Botones -->
                         <div class="form-actions">
                             <button type="button" class="btn btn-secondary" onclick="cerrarModal()">Cancelar</button>
-                            <button type="submit" class="btn btn-primary">Guardar Auditoría</button>
+                            <button type="submit" class="btn btn-primary" id="btnGuardar">Guardar Auditoría</button>
                         </div>
                     </div>
                 </form>
@@ -911,16 +904,14 @@
     </div>
 
     <script>
-        // ===== CONFIGURACIÓN GOOGLE SHEETS =====
+        // ===== CONFIGURACIÓN =====
         const SHEET_ID = '1ISly1GKF3H24h089PFbu-oJ7Tuvs6Pt8_gkLD_yeeAs';
         const SHEET_NAME = 'BD';
         const SHEET_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=${SHEET_NAME}`;
+        
+        // ⚠️ IMPORTANTE: Reemplaza esta URL con tu URL de Apps Script
+        const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz2evRGPkeRdA8oDGD6CUFgWb_UfXx2nlo-ASSTSf4kIpLtGYpFF4wwpR_zXePSHJJlww/exec';
 
-        // URL para enviar datos (Google Apps Script Web App)
-        // Necesitarás crear esto después si quieres guardar en el Sheet
-        const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz2evRGPkeRdA8oDGD6CUFgWb_UfXx2nlo-ASSTSf4kIpLtGYpFF4wwpR_zXePSHJJlww/exec'; // Lo configuraremos después
-
-        // ===== USERS =====
         const USERS = {
             calidad: { password: 'dejahair', role: 'calidad', name: 'Auditor de Calidad' },
             operaciones: { password: 'Operaciones2026', role: 'operaciones', name: 'Gerente Operaciones' }
@@ -929,7 +920,7 @@
         let currentUser = null;
         let sheetData = [];
 
-        // ===== FETCH DATA FROM GOOGLE SHEETS =====
+        // ===== FETCH DATA =====
         async function fetchSheetData() {
             try {
                 const response = await fetch(SHEET_URL);
@@ -1000,7 +991,6 @@
             setupMenuByRole();
             startDateTime();
 
-            // Cargar datos del Sheet
             await fetchSheetData();
 
             if (currentUser.role === 'operaciones') {
@@ -1010,7 +1000,7 @@
             }
         }
 
-        // ===== SETUP MENU BY ROLE =====
+        // ===== SETUP MENU =====
         function setupMenuByRole() {
             const role = currentUser.role;
             const btnDashboard = document.getElementById('btnDashboard');
@@ -1060,82 +1050,83 @@
             }
         }
 
-        // ===== ABRIR MODAL FORMULARIO =====
+        // ===== MODAL =====
         function abrirModalAuditoria() {
             document.getElementById('auditoriaModal').classList.add('show');
             document.getElementById('auditoriaForm').reset();
             document.getElementById('formMessage').innerHTML = '';
             
-            // Establecer fecha de hoy por defecto
             const today = new Date().toISOString().split('T')[0];
             document.getElementById('fechaEvaluacion').value = today;
         }
 
-        // ===== CERRAR MODAL =====
         function cerrarModal() {
             document.getElementById('auditoriaModal').classList.remove('show');
         }
 
-        /// ===== GUARDAR AUDITORÍA =====
-async function guardarAuditoria(event) {
-    event.preventDefault();
-    
-    const formData = new FormData(event.target);
-    const data = {};
-    formData.forEach((value, key) => {
-        data[key] = value;
-    });
+        // ===== GUARDAR AUDITORÍA (SOLUCIÓN FUNCIONANDO) =====
+        async function guardarAuditoria(event) {
+            event.preventDefault();
+            
+            const formData = new FormData(event.target);
+            const data = {};
+            formData.forEach((value, key) => {
+                data[key] = value;
+            });
 
-    const messageDiv = document.getElementById('formMessage');
-    const submitBtn = event.target.querySelector('button[type="submit"]');
-    
-    // Deshabilitar botón y mostrar cargando
-    submitBtn.disabled = true;
-    submitBtn.textContent = '⏳ Guardando...';
-    messageDiv.innerHTML = '<div class="loading">Enviando datos a Google Sheets...</div>';
-    
-    try {
-        // Enviar a Google Sheets
-        const response = await fetch(APPS_SCRIPT_URL, {
-            method: 'POST',
-            mode: 'no-cors',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(data)
-        });
-        
-        // Mostrar éxito (no-cors no devuelve respuesta, asumimos éxito)
-        messageDiv.innerHTML = '<div class="success-msg show">✅ Auditoría guardada correctamente en Google Sheets</div>';
-        
-        // Agregar al array local también
-        sheetData.unshift(data);
-        
-        // Cerrar modal después de 2 segundos
-        setTimeout(() => {
-            cerrarModal();
-            submitBtn.disabled = false;
-            submitBtn.textContent = 'Guardar Auditoría';
-            if (currentUser.role === 'calidad') {
-                navigateTo('gestion_calidad');
+            const messageDiv = document.getElementById('formMessage');
+            const submitBtn = document.getElementById('btnGuardar');
+            
+            submitBtn.disabled = true;
+            submitBtn.textContent = '⏳ Guardando...';
+            messageDiv.innerHTML = '<div class="loading">Enviando datos a Google Sheets...</div>';
+            
+            try {
+                const response = await fetch(APPS_SCRIPT_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+                
+                if (result.success) {
+                    messageDiv.innerHTML = '<div class="success-msg show">✅ Auditoría guardada correctamente en Google Sheets</div>';
+                    
+                    sheetData.unshift(data);
+                    
+                    setTimeout(async () => {
+                        cerrarModal();
+                        submitBtn.disabled = false;
+                        submitBtn.textContent = 'Guardar Auditoría';
+                        
+                        await fetchSheetData();
+                        
+                        if (currentUser.role === 'calidad') {
+                            navigateTo('gestion_calidad');
+                        }
+                    }, 2000);
+                } else {
+                    throw new Error(result.message || 'Error desconocido');
+                }
+                
+            } catch (error) {
+                console.error('Error:', error);
+                messageDiv.innerHTML = '<div class="error-msg show">❌ Error al guardar: ' + error.message + '</div>';
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Guardar Auditoría';
             }
-        }, 2000);
-        
-    } catch (error) {
-        messageDiv.innerHTML = '<div class="error-msg show">❌ Error al guardar: ' + error.message + '</div>';
-        submitBtn.disabled = false;
-        submitBtn.textContent = 'Guardar Auditoría';
-    }
 
-    return false;
-}
+            return false;
+        }
 
-        // ===== CALCULAR MÉTRICAS DESDE SHEET =====
+        // ===== MÉTRICAS =====
         function calcularMetricas() {
             const total = sheetData.length;
             const habilidadSI = sheetData.filter(d => d.habilidadComercial === 'SI').length;
             const promedioHabilidad = total > 0 ? Math.round((habilidadSI / total) * 100) : 0;
-            
             const ejecutivosUnicos = [...new Set(sheetData.map(d => d.ejecutivo))].length;
 
             return {
@@ -1146,7 +1137,7 @@ async function guardarAuditoria(event) {
             };
         }
 
-        // ===== DASHBOARD CONTENT =====
+        // ===== DASHBOARD =====
         function getDashboardContent() {
             const metrics = calcularMetricas();
 
@@ -1187,7 +1178,7 @@ async function guardarAuditoria(event) {
             `;
         }
 
-        // ===== RANKING CONTENT =====
+        // ===== RANKING =====
         function getRankingContent() {
             const ejecutivosMap = {};
             
@@ -1262,7 +1253,7 @@ async function guardarAuditoria(event) {
             `;
         }
 
-        // ===== GESTIÓN CALIDAD CONTENT =====
+        // ===== GESTIÓN CALIDAD =====
         function getGestionCalidadContent() {
             const rows = sheetData.slice(0, 20).map(row => `
                 <tr>
@@ -1304,7 +1295,7 @@ async function guardarAuditoria(event) {
             `;
         }
 
-        // ===== DASHBOARD CHARTS =====
+        // ===== CHARTS =====
         function createDashboardCharts() {
             const ctxH = document.getElementById('chartHabilidad');
             const ctxT = document.getElementById('chartTipo');
@@ -1345,7 +1336,6 @@ async function guardarAuditoria(event) {
             });
         }
 
-        // ===== RANKING CHART =====
         function createRankingChart() {
             const ctx = document.getElementById('chartRanking');
             if (!ctx) return;
@@ -1386,7 +1376,7 @@ async function guardarAuditoria(event) {
             });
         }
 
-        // ===== ACTUALIZAR DATOS =====
+        // ===== ACTUALIZAR =====
         async function actualizarDatos() {
             const btn = event.target;
             btn.textContent = '⏳ Actualizando...';

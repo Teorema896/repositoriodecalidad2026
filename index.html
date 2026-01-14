@@ -1017,6 +1017,7 @@
     <div class="actions">
       
       <button class="btn btn-secondary" onclick="exportToCSV()">📥 Exportar a CSV</button>
+      <button class="btn btn-secondary" onclick="mostrarRanking()">🏆 Ranking</button>
     </div>
 
     
@@ -1030,7 +1031,20 @@
         <tbody id="tableBody"></tbody>
       </table>
     </div>
+      <div class="table-container" id="rankingContainer" style="display:none">
+  <h2 class="section-title">🏆 Ranking de Ejecutivos</h2>
 
+  <table>
+    <thead>
+      <tr>
+        <th>Ejecutivo</th>
+        <th>% Promedio Evaluación</th>
+        <th>Total Auditorías</th>
+      </tr>
+    </thead>
+    <tbody id="rankingTableBody"></tbody>
+  </table>
+</div>
     </div>
 
     <!-- CONTENIDO DE FEEDBACK (pestaña oculta) -->
@@ -3524,6 +3538,56 @@ document.addEventListener('DOMContentLoaded', function(){
     applyRoleUI();
   }
 });
+function mostrarRanking() {
+  // Oculta gráficos
+  document.getElementById('chartsContainer').style.display = 'none';
+
+  // Oculta la tabla principal (la primera table-container)
+  document.querySelectorAll('.table-container')[0].style.display = 'none';
+
+  // Muestra ranking
+  document.getElementById('rankingContainer').style.display = 'block';
+
+  renderRanking();
+}
+
+function renderRanking() {
+  const resumen = {};
+
+  allData.forEach(row => {
+    const ejecutivo = row['Ejecutivo'];
+    if (!ejecutivo) return;
+
+    if (!resumen[ejecutivo]) {
+      resumen[ejecutivo] = { total: 0, si: 0 };
+    }
+
+    resumen[ejecutivo].total++;
+
+    if (row['Habilidad comercial'] === 'SI') {
+      resumen[ejecutivo].si++;
+    }
+  });
+
+  const filas = Object.keys(resumen)
+    .map(ej => {
+      const total = resumen[ej].total;
+      const porcentaje = total > 0
+        ? Math.round((resumen[ej].si / total) * 100)
+        : 0;
+
+      return `
+        <tr>
+          <td>${ej}</td>
+          <td>${porcentaje}%</td>
+          <td>${total}</td>
+        </tr>
+      `;
+    })
+    .join('');
+
+  document.getElementById('rankingTableBody').innerHTML = filas;
+}
 </script>
   </main>
 </div>

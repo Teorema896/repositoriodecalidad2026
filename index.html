@@ -70,7 +70,7 @@
                 <span class="sidebar-ico" aria-hidden="true">💬</span>
                 <span class="sidebar-text">Feedback</span>
             </button>
-            <button class="sidebar-link" type="button" data-tab="analisis" onclick="switchTab('ranking')">
+            <button class="sidebar-link" type="button" data-tab="ranking" onclick="switchTab('ranking')">
                       <span class="sidebar-ico">🏆</span>
                 <span class="sidebar-text">Ranking</span>
             </button>
@@ -258,38 +258,45 @@
                     </div>
                 </div>
 
-                <!-- ===== ANÁLISIS ===== -->
-                <div id="analisis" class="tab-content">
-                    <div class="kpis-section" style="margin-bottom: 16px;">
-                        <div class="kpis-section-title">Análisis de auditorías (ventas telefónicas)</div>
-                        <div style="font-size: 13px; color: var(--color-text-secondary);">
-                            Hallazgos accionables basados en los filtros actuales del Dashboard.
-                        </div>
-                    </div>
-
-                    <!-- KPIs Análisis -->
-                    <div class="kpis-wrapper" id="analysisKpis"></div>
-
-                    <!-- Gráficos Análisis -->
-                    <div class="charts-grid" id="analysisCharts">
-                        <div class="chart-container"><canvas id="analysisChart1"></canvas></div>
-                        <div class="chart-container"><canvas id="analysisChart2"></canvas></div>
-                        <div class="chart-container"><canvas id="analysisChart3"></canvas></div>
-                        <div class="chart-container"><canvas id="analysisChart4"></canvas></div>
-                        <div class="chart-container"><canvas id="analysisChart5"></canvas></div>
-                        <div class="chart-container"><canvas id="analysisChart6"></canvas></div>
-                    </div>
-
-                    <!-- Narrativa -->
-                    <div class="table-container">
-                        <div style="display:flex; justify-content: space-between; align-items:center; gap:12px;">
-                            <div style="font-weight:700; color: var(--color-primary);">Narrativa y acciones sugeridas</div>
-                            <button class="btn btn-secondary btn-sm" type="button" onclick="renderAnalysis()">Actualizar análisis</button>
-                        </div>
-                        <div id="analysisNarrative" style="margin-top: 12px;"></div>
+                <!-- ===== RANKING DE EJECUTIVOS ===== -->
+<div id="ranking" class="tab-content">
+    <!-- Contenido generado dinámicamente por ranking.js -->
+    <div class="ranking-placeholder">
+        <div class="placeholder-content">
+            <div class="placeholder-icon">🏆</div>
+            <h2 class="placeholder-title">Ranking de Ejecutivos</h2>
+            <p class="placeholder-text">
+                Sistema de evaluación y ranking basado en desempeño comercial y habilidades.
+            </p>
+            <div class="placeholder-stats">
+                <div class="stat-card">
+                    <div class="stat-icon">📊</div>
+                    <div class="stat-info">
+                        <div class="stat-value" id="rankingTotalEjecutivos">--</div>
+                        <div class="stat-label">Ejecutivos evaluados</div>
                     </div>
                 </div>
-
+                <div class="stat-card">
+                    <div class="stat-icon">⭐</div>
+                    <div class="stat-info">
+                        <div class="stat-value" id="rankingPromedio">--%</div>
+                        <div class="stat-label">Puntuación promedio</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">🔄</div>
+                    <div class="stat-info">
+                        <div class="stat-value" id="rankingActualizado">--:--</div>
+                        <div class="stat-label">Última actualización</div>
+                    </div>
+                </div>
+            </div>
+            <button class="btn btn-primary" onclick="renderRanking()" id="btnGenerarRanking">
+                🏆 Generar Ranking
+            </button>
+        </div>
+    </div>
+</div>
                 <!-- ===== GESTIÓN CALIDAD ===== -->
                 <div id="gestion" class="tab-content">
                     <div class="form-section">

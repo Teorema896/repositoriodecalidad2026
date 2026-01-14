@@ -4,29 +4,46 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CRM Dashboard</title>
-    <link rel="stylesheet" href="css/style.css">
+
+    <!-- Estilos principales -->
+    <link rel="stylesheet" href="./stylesmain/style.css">
+
+    <!-- Librerías opcionales -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
 </head>
 <body>
     <!-- Sidebar -->
     <aside id="sidebar">
-        <div class="logo">
-            <h2>CRM Dashboard</h2>
-        </div>
-        <ul id="menu">
-            <li data-role="calidad">Gestión Calidad</li>
-            <li data-role="operaciones">Dashboard</li>
-            <li data-role="operaciones">Ranking</li>
+        <h2>CRM Dashboard</h2>
+        <ul>
+            <li class="menu-btn" data-role="calidad" id="btnGestionCalidad">Gestión Calidad</li>
+            <li class="menu-btn" data-role="operaciones" id="btnDashboard">Dashboard</li>
+            <li class="menu-btn" data-role="operaciones" id="btnRanking">Ranking</li>
         </ul>
     </aside>
 
     <!-- Contenido principal -->
     <main id="main-content">
-        <h1>Bienvenido al CRM</h1>
-        <p id="demo-content">Aquí se mostrará información según el botón que selecciones.</p>
+        <section id="login-section">
+            <h3>Login</h3>
+            <input type="text" id="username" placeholder="Usuario">
+            <input type="password" id="password" placeholder="Contraseña">
+            <button id="loginBtn">Ingresar</button>
+            <p id="login-error" style="color:red;"></p>
+        </section>
+
+        <section id="dashboard-section" style="display:none;">
+            <h3>Bienvenido al CRM</h3>
+            <p>Aquí se mostrará información según el botón que selecciones.</p>
+        </section>
     </main>
 
-    <script src="js/main.js"></script>
-    <script src="js/table.js"></script>
-    <script src="js/charts.js"></script>
+    <!-- Scripts -->
+    <script src="./scriptsmain/main.js" defer></script>
+    <script src="./scriptstable/table.js" defer></script>
+    <script src="./scriptscharts/charts.js" defer></script>
+    <script src="./scriptsform/form.js" defer></script>
+    <script src="./scriptsapi/api.js" defer></script>
+    <script src="./scriptsutils/utils.js" defer></script>
 </body>
 </html>

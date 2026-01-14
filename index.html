@@ -918,7 +918,7 @@
 
         // URL para enviar datos (Google Apps Script Web App)
         // Necesitarás crear esto después si quieres guardar en el Sheet
-        const APPS_SCRIPT_URL = ''; // Lo configuraremos después
+        const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz2evRGPkeRdA8oDGD6CUFgWb_UfXx2nlo-ASSTSf4kIpLtGYpFF4wwpR_zXePSHJJlww/exec'; // Lo configuraremos después
 
         // ===== USERS =====
         const USERS = {
@@ -1076,34 +1076,59 @@
             document.getElementById('auditoriaModal').classList.remove('show');
         }
 
-        // ===== GUARDAR AUDITORÍA =====
-        function guardarAuditoria(event) {
-            event.preventDefault();
-            
-            const formData = new FormData(event.target);
-            const data = {};
-            formData.forEach((value, key) => {
-                data[key] = value;
-            });
+        /// ===== GUARDAR AUDITORÍA =====
+async function guardarAuditoria(event) {
+    event.preventDefault();
+    
+    const formData = new FormData(event.target);
+    const data = {};
+    formData.forEach((value, key) => {
+        data[key] = value;
+    });
 
-            const messageDiv = document.getElementById('formMessage');
-            
-            // Mostrar mensaje de éxito
-            messageDiv.innerHTML = '<div class="success-msg show">✅ Auditoría guardada correctamente en local. Para guardar en Google Sheets, configuraremos el backend en el siguiente paso.</div>';
-            
-            // Agregar al array local (temporal)
-            sheetData.unshift(data);
-            
-            // Cerrar modal después de 2 segundos
-            setTimeout(() => {
-                cerrarModal();
-                if (currentUser.role === 'calidad') {
-                    navigateTo('gestion_calidad');
-                }
-            }, 2000);
+    const messageDiv = document.getElementById('formMessage');
+    const submitBtn = event.target.querySelector('button[type="submit"]');
+    
+    // Deshabilitar botón y mostrar cargando
+    submitBtn.disabled = true;
+    submitBtn.textContent = '⏳ Guardando...';
+    messageDiv.innerHTML = '<div class="loading">Enviando datos a Google Sheets...</div>';
+    
+    try {
+        // Enviar a Google Sheets
+        const response = await fetch(APPS_SCRIPT_URL, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data)
+        });
+        
+        // Mostrar éxito (no-cors no devuelve respuesta, asumimos éxito)
+        messageDiv.innerHTML = '<div class="success-msg show">✅ Auditoría guardada correctamente en Google Sheets</div>';
+        
+        // Agregar al array local también
+        sheetData.unshift(data);
+        
+        // Cerrar modal después de 2 segundos
+        setTimeout(() => {
+            cerrarModal();
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Guardar Auditoría';
+            if (currentUser.role === 'calidad') {
+                navigateTo('gestion_calidad');
+            }
+        }, 2000);
+        
+    } catch (error) {
+        messageDiv.innerHTML = '<div class="error-msg show">❌ Error al guardar: ' + error.message + '</div>';
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Guardar Auditoría';
+    }
 
-            return false;
-        }
+    return false;
+}
 
         // ===== CALCULAR MÉTRICAS DESDE SHEET =====
         function calcularMetricas() {

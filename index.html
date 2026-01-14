@@ -4,53 +4,577 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CRM Calidad - Scotiabank</title>
-    <link rel="stylesheet" href="styles/main.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f0f2f5;
+            color: #333;
+        }
+
+        /* ========== LOGIN STYLES ========== */
+        .login-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+        }
+
+        .login-box {
+            background: white;
+            padding: 50px 40px;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            width: 100%;
+            max-width: 420px;
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 35px;
+        }
+
+        .login-header h1 {
+            font-size: 32px;
+            color: #1e3c72;
+            margin-bottom: 8px;
+            font-weight: 700;
+        }
+
+        .login-header p {
+            color: #7f8c8d;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #2c3e50;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e6ed;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s;
+            background: #f8f9fa;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #2a5298;
+            background: white;
+            box-shadow: 0 0 0 4px rgba(42, 82, 152, 0.1);
+        }
+
+        .error-msg {
+            display: none;
+            color: #e74c3c;
+            background: #fadbd8;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            font-size: 13px;
+            border-left: 4px solid #e74c3c;
+        }
+
+        .error-msg.show {
+            display: block;
+        }
+
+        .btn-login {
+            width: 100%;
+            padding: 13px;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 10px;
+        }
+
+        .btn-login:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(42, 82, 152, 0.3);
+        }
+
+        .login-help {
+            margin-top: 30px;
+            padding-top: 25px;
+            border-top: 1px solid #ecf0f1;
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+        }
+
+        .login-help p {
+            margin: 8px 0;
+            font-size: 13px;
+            color: #555;
+        }
+
+        .login-help strong {
+            color: #2c3e50;
+            font-weight: 600;
+        }
+
+        .login-help-title {
+            color: #2c3e50;
+            font-weight: 700;
+            margin-bottom: 10px;
+            font-size: 13px;
+        }
+
+        /* ========== APP CONTAINER ========== */
+        .app-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* ========== SIDEBAR ========== */
+        .sidebar {
+            width: 260px;
+            background: linear-gradient(180deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 2px 0 15px rgba(0, 0, 0, 0.1);
+            overflow-y: auto;
+            position: fixed;
+            height: 100vh;
+            left: 0;
+            top: 0;
+        }
+
+        .sidebar-header {
+            padding: 30px 20px 25px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        .sidebar-header h2 {
+            font-size: 20px;
+            margin-bottom: 5px;
+            font-weight: 700;
+        }
+
+        .user-role {
+            font-size: 12px;
+            opacity: 0.85;
+            color: #b3d9ff;
+            font-weight: 500;
+        }
+
+        .sidebar-menu {
+            flex: 1;
+            padding: 20px 0;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .menu-btn {
+            background: transparent;
+            color: rgba(255, 255, 255, 0.8);
+            border: none;
+            padding: 14px 20px;
+            font-weight: 500;
+            text-align: left;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+            border-left: 4px solid transparent;
+            margin: 0 10px;
+            border-radius: 8px 0 0 8px;
+        }
+
+        .menu-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .menu-btn.active {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border-left-color: #4ecdc4;
+            box-shadow: inset -3px 0 0 rgba(78, 205, 196, 0.5);
+        }
+
+        .sidebar-footer {
+            padding: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.15);
+            background: rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-logout {
+            width: 100%;
+            padding: 12px;
+            background: #e74c3c;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.3s;
+        }
+
+        .btn-logout:hover {
+            background: #c0392b;
+        }
+
+        /* ========== MAIN CONTENT ========== */
+        .main-content {
+            flex: 1;
+            margin-left: 260px;
+            display: flex;
+            flex-direction: column;
+            background: #f0f2f5;
+            min-height: 100vh;
+        }
+
+        .app-header {
+            background: white;
+            padding: 20px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            border-bottom: 1px solid #ecf0f1;
+        }
+
+        .header-left h1 {
+            font-size: 26px;
+            color: #2c3e50;
+            font-weight: 700;
+            margin: 0;
+        }
+
+        .date-time {
+            font-size: 13px;
+            color: #7f8c8d;
+            font-weight: 500;
+        }
+
+        .page-content {
+            flex: 1;
+            padding: 30px;
+            overflow-y: auto;
+        }
+
+        /* ========== SECTION HEADER ========== */
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            gap: 20px;
+        }
+
+        .section-header h2 {
+            font-size: 24px;
+            color: #2c3e50;
+            font-weight: 700;
+            margin: 0;
+        }
+
+        .btn {
+            padding: 11px 20px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(42, 82, 152, 0.25);
+        }
+
+        .btn-secondary {
+            background: #ecf0f1;
+            color: #2c3e50;
+            border: 1px solid #bdc3c7;
+        }
+
+        .btn-secondary:hover {
+            background: #d5dbdb;
+        }
+
+        /* ========== METRICS GRID ========== */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 20px;
+            margin-bottom: 35px;
+        }
+
+        .metric-card {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+            border-top: 4px solid #2a5298;
+            transition: all 0.3s;
+        }
+
+        .metric-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+        }
+
+        .metric-label {
+            font-size: 12px;
+            color: #7f8c8d;
+            font-weight: 600;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+            letter-spacing: 0.5px;
+        }
+
+        .metric-value {
+            font-size: 38px;
+            font-weight: 700;
+            color: #2a5298;
+            margin: 8px 0;
+        }
+
+        .metric-trend {
+            font-size: 12px;
+            color: #27ae60;
+            margin-top: 10px;
+        }
+
+        /* ========== CHARTS GRID ========== */
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .chart-container {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+        }
+
+        .chart-container h3 {
+            font-size: 16px;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+
+        /* ========== TABLE ========== */
+        .table-container {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+            overflow-x: auto;
+        }
+
+        .search-bar {
+            margin-bottom: 20px;
+        }
+
+        .search-input {
+            padding: 11px 15px;
+            border: 2px solid #e0e6ed;
+            border-radius: 8px;
+            width: 100%;
+            max-width: 350px;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #2a5298;
+            box-shadow: 0 0 0 4px rgba(42, 82, 152, 0.1);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 14px;
+            text-align: left;
+            border-bottom: 1px solid #ecf0f1;
+            font-size: 13px;
+        }
+
+        th {
+            background: #f8f9fa;
+            font-weight: 700;
+            color: #2c3e50;
+            text-transform: uppercase;
+            font-size: 12px;
+            letter-spacing: 0.5px;
+        }
+
+        tr:hover {
+            background: #f8f9fa;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .badge-success {
+            background: #d5f4e6;
+            color: #27ae60;
+        }
+
+        .badge-error {
+            background: #fadbd8;
+            color: #e74c3c;
+        }
+
+        .badge-pending {
+            background: #fef5e7;
+            color: #f39c12;
+        }
+
+        /* ========== REPORTES GRID ========== */
+        .reportes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 20px;
+        }
+
+        .reporte-card {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+            text-align: center;
+            transition: all 0.3s;
+        }
+
+        .reporte-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+        }
+
+        .reporte-card h3 {
+            font-size: 16px;
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .reporte-card p {
+            font-size: 13px;
+            color: #7f8c8d;
+            margin-bottom: 15px;
+        }
+
+        /* ========== RESPONSIVE ========== */
+        @media (max-width: 768px) {
+            .sidebar {
+                position: static;
+                width: 100%;
+                height: auto;
+                flex-direction: row;
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .sidebar-menu {
+                flex-direction: row;
+                overflow-x: auto;
+            }
+
+            .metrics-grid, .charts-grid, .reportes-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
 </head>
 <body>
 
-    <!-- ========== SECCIÓN LOGIN ========== -->
+    <!-- ========== LOGIN ========== -->
     <div id="loginSection" class="login-container">
         <div class="login-box">
             <div class="login-header">
-                <h1>CRM Calidad</h1>
-                <p>Sistema de Gestión de Calidad</p>
+                <h1>🏢 CRM Calidad</h1>
+                <p>Sistema de Gestión de Calidad - Scotiabank</p>
             </div>
-            
-            <form id="loginForm" onsubmit="return handleLogin(event)">
+
+            <form id="loginForm" onsubmit="handleLogin(event)">
                 <div class="form-group">
                     <label for="username">Usuario</label>
                     <input type="text" id="username" placeholder="Ingrese su usuario" required>
                 </div>
-                
+
                 <div class="form-group">
                     <label for="password">Contraseña</label>
                     <input type="password" id="password" placeholder="Ingrese su contraseña" required>
                 </div>
-                
+
                 <div id="loginError" class="error-msg"></div>
-                
-                <button type="submit" class="btn btn-login">Iniciar Sesión</button>
+
+                <button type="submit" class="btn-login">Iniciar Sesión</button>
             </form>
-            
+
             <div class="login-help">
-                <p><strong>Demo Usuarios:</strong></p>
-                <p>👤 <strong>calidad</strong> / dejahair</p>
-                <p>👤 <strong>operaciones</strong> / Operaciones2026</p>
+                <div class="login-help-title">📌 Demo Usuarios:</div>
+                <p><strong>👤 calidad</strong> / dejahair</p>
+                <p><strong>👤 operaciones</strong> / Operaciones2026</p>
             </div>
         </div>
     </div>
 
-    <!-- ========== SECCIÓN APP (OCULTA INICIALMENTE) ========== -->
+    <!-- ========== APP ========== -->
     <div id="appContainer" class="app-container hidden">
-        
-        <!-- SIDEBAR MENÚ -->
-        <aside id="sidebar" class="sidebar">
+        <!-- SIDEBAR -->
+        <aside class="sidebar">
             <div class="sidebar-header">
-                <h2>CRM</h2>
-                <p id="userRole" class="user-role"></p>
+                <h2>CRM Calidad</h2>
+                <p class="user-role" id="userRole"></p>
             </div>
-            
+
             <nav class="sidebar-menu">
                 <button class="menu-btn active" data-section="dashboard" onclick="navigateTo('dashboard')">
                     📊 Dashboard
@@ -65,38 +589,386 @@
                     📄 Reportes
                 </button>
             </nav>
-            
+
             <div class="sidebar-footer">
-                <button class="btn btn-logout" onclick="logout()">🚪 Cerrar</button>
+                <button class="btn-logout" onclick="logout()">🚪 Cerrar Sesión</button>
             </div>
         </aside>
 
-        <!-- CONTENIDO PRINCIPAL -->
-        <main id="mainContent" class="main-content">
-            
-            <!-- Header -->
+        <!-- MAIN CONTENT -->
+        <main class="main-content">
             <header class="app-header">
                 <div class="header-left">
                     <h1 id="pageTitle">Dashboard</h1>
                 </div>
                 <div class="header-right">
-                    <div id="dateTime" class="date-time"></div>
+                    <div class="date-time" id="dateTime"></div>
                 </div>
             </header>
 
-            <!-- Contenido dinámico -->
-            <section id="pageContent" class="page-content">
-                <!-- Se carga dinámicamente -->
+            <section class="page-content" id="pageContent">
+                <!-- Content loaded dynamically -->
             </section>
         </main>
     </div>
 
-    <!-- Scripts -->
-    <script src="scripts/utils.js"></script>
-    <script src="scripts/main.js"></script>
-    <script src="scripts/table.js"></script>
-    <script src="scripts/charts.js"></script>
-    <script src="scripts/form.js"></script>
+    <script>
+        // ===== CONFIG =====
+        const USERS = {
+            calidad: { password: 'dejahair', role: 'calidad', name: 'Auditor de Calidad' },
+            operaciones: { password: 'Operaciones2026', role: 'operaciones', name: 'Gerente Operaciones' }
+        };
+
+        const sampleData = [
+            { Ejecutivo: 'Juan Perez', 'Habilidad Comercial': 'SI', 'Tipo de Llamada': 'Venta' },
+            { Ejecutivo: 'Maria Gomez', 'Habilidad Comercial': 'NO', 'Tipo de Llamada': 'No Venta' },
+            { Ejecutivo: 'Luis Torres', 'Habilidad Comercial': 'SI', 'Tipo de Llamada': 'Venta' },
+            { Ejecutivo: 'Ana Ruiz', 'Habilidad Comercial': 'SI', 'Tipo de Llamada': 'No Venta' },
+            { Ejecutivo: 'Carlos Diaz', 'Habilidad Comercial': 'NO', 'Tipo de Llamada': 'Venta' },
+        ];
+
+        let currentUser = null;
+
+        // ===== LOGIN =====
+        function handleLogin(event) {
+            event.preventDefault();
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value.trim();
+            const errorDiv = document.getElementById('loginError');
+
+            if (USERS[username] && USERS[username].password === password) {
+                currentUser = { username, ...USERS[username] };
+                sessionStorage.setItem('currentUser', JSON.stringify(currentUser));
+                document.getElementById('loginForm').reset();
+                errorDiv.classList.remove('show');
+                showApp();
+            } else {
+                errorDiv.textContent = '❌ Usuario o contraseña incorrectos';
+                errorDiv.classList.add('show');
+            }
+            return false;
+        }
+
+        // ===== SHOW APP =====
+        function showApp() {
+            document.getElementById('loginSection').classList.add('hidden');
+            document.getElementById('appContainer').classList.remove('hidden');
+            document.getElementById('userRole').textContent = currentUser.name;
+            setupMenuByRole();
+            startDateTime();
+            navigateTo('dashboard');
+        }
+
+        // ===== SETUP MENU =====
+        function setupMenuByRole() {
+            const role = currentUser.role;
+            if (role === 'calidad') {
+                document.getElementById('btnAuditorias').style.display = 'block';
+                document.getElementById('btnEjecutivos').style.display = 'block';
+                document.getElementById('btnReportes').style.display = 'block';
+            } else if (role === 'operaciones') {
+                document.getElementById('btnAuditorias').style.display = 'block';
+                document.getElementById('btnReportes').style.display = 'block';
+                document.getElementById('btnEjecutivos').style.display = 'none';
+            }
+        }
+
+        // ===== NAVIGATE =====
+        function navigateTo(section) {
+            document.querySelectorAll('.menu-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelector(`[data-section="${section}"]`).classList.add('active');
+
+            const titles = {
+                dashboard: '📊 Dashboard',
+                auditorias: '✓ Auditorías',
+                ejecutivos: '👥 Ejecutivos',
+                reportes: '📄 Reportes'
+            };
+            document.getElementById('pageTitle').textContent = titles[section];
+
+            const pageContent = document.getElementById('pageContent');
+
+            if (section === 'dashboard') {
+                pageContent.innerHTML = getDashboardContent();
+                setTimeout(() => {
+                    createCharts();
+                }, 100);
+            } else if (section === 'auditorias') {
+                pageContent.innerHTML = getAuditoriasContent();
+            } else if (section === 'ejecutivos') {
+                pageContent.innerHTML = getEjecutivosContent();
+            } else if (section === 'reportes') {
+                pageContent.innerHTML = getReportesContent();
+            }
+        }
+
+        // ===== CONTENT FUNCTIONS =====
+        function getDashboardContent() {
+            return `
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <div class="metric-label">Calidad Promedio</div>
+                        <div class="metric-value">85%</div>
+                        <div class="metric-trend">↑ 2.5% vs mes anterior</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-label">Auditorías Mes</div>
+                        <div class="metric-value">24</div>
+                        <div class="metric-trend">+5 auditorías</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-label">Ejecutivos Evaluados</div>
+                        <div class="metric-value">5</div>
+                        <div class="metric-trend">100% del equipo</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-label">Tasa de Conformidad</div>
+                        <div class="metric-value">92%</div>
+                        <div class="metric-trend">Meta: 85% ✓</div>
+                    </div>
+                </div>
+
+                <div class="charts-grid">
+                    <div class="chart-container">
+                        <h3>Habilidad Comercial</h3>
+                        <canvas id="chart1"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <h3>Tipo de Llamada</h3>
+                        <canvas id="chart2"></canvas>
+                    </div>
+                </div>
+            `;
+        }
+
+        function getAuditoriasContent() {
+            return `
+                <div class="section-header">
+                    <h2>Gestión de Auditorías</h2>
+                    <button class="btn btn-primary" onclick="alert('Funcionalidad próximamente')">+ Nueva Auditoría</button>
+                </div>
+                <div class="search-bar">
+                    <input type="text" class="search-input" placeholder="Buscar auditoría...">
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Ejecutivo</th>
+                                <th>Fecha</th>
+                                <th>Calificación</th>
+                                <th>Estado</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>#001</td>
+                                <td>Juan Perez</td>
+                                <td>14/01/2026</td>
+                                <td><strong>85%</strong></td>
+                                <td><span class="badge badge-success">Completo</span></td>
+                                <td><a href="#" style="color: #2a5298; text-decoration: none;">Ver</a></td>
+                            </tr>
+                            <tr>
+                                <td>#002</td>
+                                <td>Maria Gomez</td>
+                                <td>13/01/2026</td>
+                                <td><strong>92%</strong></td>
+                                <td><span class="badge badge-success">Completo</span></td>
+                                <td><a href="#" style="color: #2a5298; text-decoration: none;">Ver</a></td>
+                            </tr>
+                            <tr>
+                                <td>#003</td>
+                                <td>Luis Torres</td>
+                                <td>12/01/2026</td>
+                                <td><strong>78%</strong></td>
+                                <td><span class="badge badge-pending">Pendiente</span></td>
+                                <td><a href="#" style="color: #2a5298; text-decoration: none;">Ver</a></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        }
+
+        function getEjecutivosContent() {
+            return `
+                <div class="section-header">
+                    <h2>Ranking de Ejecutivos</h2>
+                    <button class="btn btn-primary" onclick="alert('Funcionalidad próximamente')">+ Agregar Ejecutivo</button>
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Ejecutivo</th>
+                                <th>Equipo</th>
+                                <th>Auditorías</th>
+                                <th>Promedio</th>
+                                <th>Posición</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Maria Gomez</strong></td>
+                                <td>Servicio</td>
+                                <td>8</td>
+                                <td>92%</td>
+                                <td>🥇 1°</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Juan Perez</strong></td>
+                                <td>Ventas</td>
+                                <td>7</td>
+                                <td>85%</td>
+                                <td>🥈 2°</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Ana Ruiz</strong></td>
+                                <td>Cobranza</td>
+                                <td>6</td>
+                                <td>88%</td>
+                                <td>🥉 3°</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Luis Torres</strong></td>
+                                <td>Ventas</td>
+                                <td>5</td>
+                                <td>81%</td>
+                                <td>4°</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Carlos Diaz</strong></td>
+                                <td>Servicio</td>
+                                <td>4</td>
+                                <td>79%</td>
+                                <td>5°</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        }
+
+        function getReportesContent() {
+            return `
+                <div class="section-header">
+                    <h2>Reportes y Análisis</h2>
+                    <button class="btn btn-primary" onclick="alert('Funcionalidad próximamente')">📥 Descargar</button>
+                </div>
+                <div class="reportes-grid">
+                    <div class="reporte-card">
+                        <h3>📈 Reporte Mensual</h3>
+                        <p>Análisis completo del mes actual con gráficos y estadísticas detalladas</p>
+                        <button class="btn btn-secondary" onclick="alert('Funcionalidad próximamente')">Generar</button>
+                    </div>
+                    <div class="reporte-card">
+                        <h3>👤 Por Ejecutivo</h3>
+                        <p>Desempeño individual con histórico de evaluaciones</p>
+                        <button class="btn btn-secondary" onclick="alert('Funcionalidad próximamente')">Generar</button>
+                    </div>
+                    <div class="reporte-card">
+                        <h3>📊 Por Criterio</h3>
+                        <p>Análisis de criterios de evaluación y debilidades</p>
+                        <button class="btn btn-secondary" onclick="alert('Funcionalidad próximamente')">Generar</button>
+                    </div>
+                    <div class="reporte-card">
+                        <h3>📉 Tendencias</h3>
+                        <p>Proyecciones y tendencias para los próximos periodos</p>
+                        <button class="btn btn-secondary" onclick="alert('Funcionalidad próximamente')">Generar</button>
+                    </div>
+                </div>
+            `;
+        }
+
+        // ===== CHARTS =====
+        function createCharts() {
+            const ctx1 = document.getElementById('chart1');
+            const ctx2 = document.getElementById('chart2');
+
+            if (!ctx1 || !ctx2) return;
+
+            new Chart(ctx1, {
+                type: 'doughnut',
+                data: {
+                    labels: ['SI', 'NO'],
+                    datasets: [{
+                        data: [3, 2],
+                        backgroundColor: ['#27ae60', '#e74c3c'],
+                        borderColor: ['#fff', '#fff'],
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { position: 'bottom' }
+                    }
+                }
+            });
+
+            new Chart(ctx2, {
+                type: 'bar',
+                data: {
+                    labels: ['Venta', 'No Venta'],
+                    datasets: [{
+                        label: 'Cantidad',
+                        data: [3, 2],
+                        backgroundColor: '#2a5298',
+                        borderRadius: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: { beginAtZero: true }
+                    }
+                }
+            });
+        }
+
+        // ===== LOGOUT =====
+        function logout() {
+            if (confirm('¿Cerrar sesión?')) {
+                sessionStorage.removeItem('currentUser');
+                currentUser = null;
+                document.getElementById('loginSection').classList.remove('hidden');
+                document.getElementById('appContainer').classList.add('hidden');
+                document.getElementById('loginForm').reset();
+            }
+        }
+
+        // ===== DATE TIME =====
+        function startDateTime() {
+            const el = document.getElementById('dateTime');
+            function update() {
+                el.textContent = new Date().toLocaleString('es-PE', {
+                    weekday: 'short',
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+            }
+            update();
+            setInterval(update, 1000);
+        }
+
+        // ===== INIT =====
+        document.addEventListener('DOMContentLoaded', () => {
+            const saved = sessionStorage.getItem('currentUser');
+            if (saved) {
+                currentUser = JSON.parse(saved);
+                showApp();
+            }
+        });
+    </script>
 
 </body>
 </html>

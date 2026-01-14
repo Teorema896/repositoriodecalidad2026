@@ -1,6 +1,5 @@
 // dashboard.js - CONEXIÓN A GOOGLE SHEETS
 const GOOGLE_SHEETS_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTR4TBW_qQtsV-yHeyv_EJhixz5qW1AFxXyWLZYxEa95MrUWiqrLrpJuVdFAPmtFKUnvtQ1mO0muhNq/pub?gid=0&single=true&output=csv';
-
 // Variables globales
 let allData = [];
 let filteredData = [];
@@ -223,3 +222,4 @@ if (document.getElementById('dashboard')) {
     console.log('Dashboard detectado, cargando datos...');
     setTimeout(() => loadDataFromGoogleSheets(), 500);
 }
+
